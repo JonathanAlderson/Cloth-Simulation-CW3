@@ -22,6 +22,8 @@ int main(int argc, char **argv)
 	// initialize QT
 	QApplication app(argc, argv);
 
+	std::cout << "New Commit" << '\n';
+
 	// Set the filename to empty string if not provided
 	char * filename = argv[1];
 	char empty = '\0';
