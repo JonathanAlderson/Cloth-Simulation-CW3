@@ -29,22 +29,59 @@ Spring::Spring(PointMass *a, PointMass *b, float springK)
     pmB = b;
     springConst = springK;
 
-    //std::cout << "Spring:  " <<  << '\n';
-
     // render constants
-    radius = 0.3;
+    radius = 0.1;
     slices = 10;
     stack = 3;
 
     // calcualte initial distance as rest length
     lr = pmA->pos.distance(pmB->pos);
     lc = lr; // makes sense, we start the same as rest length
+
+    // set default force
+    force = Cartesian3(0., 0., 0.);
+
+    // find the inital colour
+    CalculateColour();
 }
 
-void Spring::Update()
+void Spring::Update(float dt)
 {
   // here is where the difficult physics comes in
 
+  // find the current length of the spring
+  Cartesian3 p1 = pmA->pos;
+  Cartesian3 p2 = pmB->pos;
+
+  lc = p1.distance(p2);
+
+  // calculate the force
+  force = (p2 - p1).normalise() * (-springConst * (lc - lr));
+
+  // finally update the colour
+  CalculateColour();
+
+  std::cout << "Calculating Spring Force" << '\n';
+  std::cout << (p2 - p1).normalise() << '\n';
+  std::cout << (-springConst * (lc - lr)) << '\n';
+
+  std::cout << "Spring: " << force << '\n';
+}
+
+// finds colour based off forces
+void Spring::CalculateColour()
+{
+  float maxForce = 50.;
+  float cForceFloat = abs(force.x) + abs(force.y) + abs(force.z);
+  float ratio;
+
+  ratio = cForceFloat / maxForce;
+
+  // 1. if no forces
+  ratio = 1. - ratio;
+
+  // point masses get redder as more force is applied to them
+  col = Cartesian3(1., ratio, ratio);
 }
 
 // draw a glu cylinder between pmA --> pmB
@@ -52,10 +89,13 @@ void Spring::Update()
 // taken from RenderBone() bvh.
 void Spring::Render()
 {
+  // set the colour of the spring depending on the forces acting on it
+  glColor3f(col.x, col.y, col.z);
+
   // Calculate a from -> to vector
-  GLdouble  dir_x = pmA->pos.x - pmB->pos.x;
-  GLdouble  dir_y = pmA->pos.y - pmB->pos.y;
-  GLdouble  dir_z = pmA->pos.z - pmB->pos.z;
+  GLdouble  dir_x = pmB->pos.x - pmA->pos.x;
+  GLdouble  dir_y = pmB->pos.y - pmA->pos.y;
+  GLdouble  dir_z = pmB->pos.z - pmA->pos.z;
 
   // Uses GLU for rendering
   static GLUquadricObj *  quadObj = NULL;
@@ -90,7 +130,7 @@ void Spring::Render()
   side_y = up_z * dir_x - up_x * dir_z;
   side_z = up_x * dir_y - up_y * dir_x;
 
-  // if bone is too short, do this to avoid
+  // if spring is too short, do this to avoid
   // wierd rendering errors
   length = sqrt( side_x*side_x + side_y*side_y + side_z*side_z );
   if ( length < 0.0001 ) {
@@ -105,12 +145,11 @@ void Spring::Render()
 
   // local rotation matrix
   GLdouble  m[16] = { side_x, side_y, side_z, 0.0,
-                            up_x,   up_y,   up_z,   0.0,
-                            dir_x,  dir_y,  dir_z,  0.0,
-                            0.0,    0.0,    0.0,    1.0 };
+                      up_x,   up_y,   up_z,   0.0,
+                      dir_x,  dir_y,  dir_z,  0.0,
+                      0.0,    0.0,    0.0,    1.0 };
 
   glMultMatrixd( m );
-
 
   // with all our new found info, render a gluCylinder
   gluCylinder( quadObj, radius, radius, lc, slices, stack );

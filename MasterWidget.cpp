@@ -16,6 +16,7 @@
 
 MasterWidget::MasterWidget(char *filename, QWidget *parent)
 {
+    std::cout << "Master Widget Init" << '\n';
 
     // Setup the Render Widget, passing the filename
     renderWidget = new RenderWidget(filename, this);
@@ -62,12 +63,15 @@ MasterWidget::MasterWidget(char *filename, QWidget *parent)
     windCheck            ->setText("Wind");
     sphereSpinBox        ->setRange(0, 1000);
     sphereSpinBox        ->setSingleStep(1);
-    sphereFrictionSpinBox->setValue(1);
+    sphereSpinBox        ->setValue(1);
     sphereFrictionSpinBox->setRange(0, 1000);
+    sphereFrictionSpinBox->setSingleStep(1);
+    sphereFrictionSpinBox->setValue(1);
+    windSpeedSpinBox     ->setRange(0, 1000);
     windSpeedSpinBox     ->setSingleStep(1);
     windSpeedSpinBox     ->setValue(1);
     gravitySpinBox       ->setRange(0, 1000);
-    //gravitySpinBox       ->setSingleStep(1);
+    gravitySpinBox       ->setSingleStep(1);
     gravitySpinBox       ->setValue(10);
 
 
@@ -153,8 +157,6 @@ MasterWidget::MasterWidget(char *filename, QWidget *parent)
     connect(windCheck,             SIGNAL(pressed()),      this,         SLOT(toggleWind()));
 
     timer->start(16);
-
-    std::cout << "Master Widget Init Done" << '\n';
 }
 
 // Default slider params
@@ -200,6 +202,10 @@ void MasterWidget::keyPressEvent(QKeyEvent* event)
     // Move Camera Right
     case Qt::Key_D:
       renderWidget->rht = true;
+      break;
+    // Turn shift on and off
+    case Qt::Key_Shift:
+      shiftHeld = true;
       break;
   }
 
@@ -263,6 +269,7 @@ void MasterWidget::wheelEvent(QWheelEvent* event)
   {
     if(renderWidget->zoom > 0.1){ renderWidget->camera.ProcessMouseScroll(-1); }
   }
+
   renderWidget->updatePerspective();
   renderWidget->updateGL();
 
@@ -272,15 +279,12 @@ void MasterWidget::wheelEvent(QWheelEvent* event)
 void MasterWidget::pause()
 {
   renderWidget->paused = true;
-  std::cout << "Pause" << '\n';
 }
 
 // Plays The Current Animation
 void MasterWidget::play()
 {
-  std::cout << "Play" << '\n';
   renderWidget->paused = false;
-  std::cout << "Plasy" << '\n';
 }
 
 // Changes the boolean
@@ -289,8 +293,6 @@ void MasterWidget::playPause()
   bool p = renderWidget->paused;
   if(p){ renderWidget->paused = false; return; }
   else{ renderWidget->paused = true; return; }
-  std::cout << "playpiuse" << '\n';
-
 }
 
 // Stops playback of the current animation

@@ -28,8 +28,8 @@ using namespace std;
 #include "Cartesian3.h"
 #include "camera.h"
 #include "PointMass.h"
-#include "glm.hpp"
-#include "gtc/type_ptr.hpp"
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 // openGL includes
 #ifdef __APPLE__
@@ -58,15 +58,19 @@ public:
   float springConst; // springiness of the spring
   float lr;          // rest length
   float lc;          // current length
-
+  Cartesian3 force;       // current force the spring exerts
 
   // render options
   GLdouble radius;
   GLdouble slices;
   GLdouble stack;
+  Cartesian3 col;
 
   // does a pysics calculation based on distacnes of Pointmasses
-  void Update();
+  void Update(float dt);
+
+  // updates the colour depending on the forces acting on it
+  void CalculateColour();
 
   // render a spring at position
   // colour indicates external forces

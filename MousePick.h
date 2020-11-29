@@ -13,12 +13,13 @@
 
 #ifndef MOUSEPICK_H
 #define MOUSEPICK_H
+#define GLM_ENABLE_EXPERIMENTAL 
 
 #include "Cartesian3.h"
 #include "camera.h"
-#include "glm.hpp"
-#include "gtc/type_ptr.hpp"
-#include "gtx/intersect.hpp"
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/intersect.hpp>
 #include <vector>
 
 class MousePick

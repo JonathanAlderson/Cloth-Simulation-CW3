@@ -24,8 +24,8 @@ using namespace std;
 #include "Cartesian3.h"
 #include "camera.h"
 #include "Cloth.h"
-#include "glm.hpp"
-#include "gtc/type_ptr.hpp"
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 // openGL includes
 #ifdef __APPLE__
@@ -99,6 +99,15 @@ public:
   float gravity;
 
 public:
+
+  // Call for Physics Updates
+  void Update(float dT);
+
+  // Update Physics with Euler (Called By Update)
+  void EulerUpdate(float dT);
+
+  // Update Physics with Verlet intergration
+  void VerletUpdate(float dT);
 
   // Call For Rendering
   void Render(int frameNo, Camera *camera);

@@ -50,6 +50,10 @@ RenderWidget::RenderWidget(char *filename, MasterWidget *parent)
 		paused = true;
 		playbackSpeed = 1.0;
 
+		// mouse position init
+		mouseLastX = 0.;
+		mouseLastY = 0.;
+
 		// default camera values
 		fwd = false;
 		lft = false;
@@ -72,7 +76,6 @@ RenderWidget::RenderWidget(char *filename, MasterWidget *parent)
 
 		setMouseTracking(true);
 
-		std::cout << "Render Widget Init Done" << '\n';
 	} // constructor
 
 // destructor
@@ -128,6 +131,7 @@ void RenderWidget::resizeGL(int w, int h)
 
 void RenderWidget::updatePerspective()
 { // updatePerspective()
+	std::cout << "Update gluPerspective" << '\n';
 	float aspectRatio = (float) screenW / (float) screenH;
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -137,6 +141,7 @@ void RenderWidget::updatePerspective()
 // called every time the widget needs painting
 void RenderWidget::paintGL()
 	{ // RenderWidget::paintGL()
+	std::cout << "Paint GL" << '\n';
 	// clear the buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -181,7 +186,7 @@ void RenderWidget::paintGL()
 	//std::cout << xTrans << " " << yTrans << " " << zTrans << '\n';
 	//glTranslatef(-xTrans, -yTrans, zTrans - 25.);
 
-	// Render Skeleton At Current Frame
+	// Render Simulation
 	sim->Render(cFrame, &camera);
 
 	//glTranslatef(xTrans, yTrans, -(zTrans - 25.));
@@ -194,6 +199,7 @@ void RenderWidget::paintGL()
 void RenderWidget::mousePressEvent(QMouseEvent *event)
 	{ // RenderWidget::mousePressEvent()
 	// store the button for future reference
+
 	whichButton = event->button();
 
 	// find the minimum of height & width
@@ -239,70 +245,73 @@ void RenderWidget::mouseMoveEvent(QMouseEvent *event)
 
 	// rotate the camera if clicking
 	// now either translate or rotate object or light
-	if(mousePicker->dragging == true)
+
+	// todo mouse move
+	// if(mousePicker->dragging == true)
+	// {
+	// 	glm::vec3 mouseMove = mousePicker->drag(currX, currY, &camera);
+	//
+	// 	mouseMove.x = -mouseMove.x;
+	// 	mouseMove.y = -mouseMove.y;
+	//
+	// 	// TODO make this a sensetivity
+	// 	mouseMove *= 1000.0;
+	//
+	// 	//sim->cloth->MovePoint(mouseMove);
+	//
+	// 	// if(doneOnce != true)
+	// 	// {
+	// 	//
+	// 	// 	std::cout << "Mouse Movement" << '\n';
+	// 	// 	for(int i = 0; i < 3; i++)
+	// 	// 	{
+	// 	// 		std::cout << mouseMove[i] << "  ";
+	// 	// 	}
+	// 	// 	// global positoin before
+	// 	// 	std::cout << "Global Positoin" << '\n';
+	// 	// 	std::cout << bvh->joints[22]->name << '\n';
+	// 	// 	std::cout << bvh->globalPositions[22*3] << " " << bvh->globalPositions[22*3 + 1] << " " << bvh->globalPositions[22*3 + 2] << '\n';
+	// 	//
+	// 	// 	// move one joint
+	// 	// 	bvh->MoveJoint(mousePicker->closest, mouseMove, 1);
+	// 	//
+	// 	//
+	// 	// 	doneOnce = true;
+	// 	// }
+	// 	// else
+	// 	// {
+	// 	// 	std::cout << "Global Positoin After" << '\n';
+	// 	// 	std::cout << bvh->joints[22]->name << '\n';
+	// 	// 	std::cout << bvh->globalPositions[22*3] << " " << bvh->globalPositions[22*3 + 1] << " " << bvh->globalPositions[22*3 + 2] << '\n';
+	// 	//
+	// 	// }
+	//
+	// 	// TODO
+	// 	paintGL();
+	// 	updateGL();
+	// }
+
+	// only move the camera if we are not dragging
+	if(movingCamera)
 	{
-		glm::vec3 mouseMove = mousePicker->drag(currX, currY, &camera);
-
-		mouseMove.x = -mouseMove.x;
-		mouseMove.y = -mouseMove.y;
-
-		// TODO make this a sensetivity
-		mouseMove *= 1000.0;
-
-		//sim->cloth->MovePoint(mouseMove);
-
-		// if(doneOnce != true)
-		// {
-		//
-		// 	std::cout << "Mouse Movement" << '\n';
-		// 	for(int i = 0; i < 3; i++)
-		// 	{
-		// 		std::cout << mouseMove[i] << "  ";
-		// 	}
-		// 	// global positoin before
-		// 	std::cout << "Global Positoin" << '\n';
-		// 	std::cout << bvh->joints[22]->name << '\n';
-		// 	std::cout << bvh->globalPositions[22*3] << " " << bvh->globalPositions[22*3 + 1] << " " << bvh->globalPositions[22*3 + 2] << '\n';
-		//
-		// 	// move one joint
-		// 	bvh->MoveJoint(mousePicker->closest, mouseMove, 1);
-		//
-		//
-		// 	doneOnce = true;
-		// }
-		// else
-		// {
-		// 	std::cout << "Global Positoin After" << '\n';
-		// 	std::cout << bvh->joints[22]->name << '\n';
-		// 	std::cout << bvh->globalPositions[22*3] << " " << bvh->globalPositions[22*3 + 1] << " " << bvh->globalPositions[22*3 + 2] << '\n';
-		//
-		// }
-
-		// TODO
+		std::cout << "Moving Camera" << '\n';
+		camera.ProcessMouseMovement((mouseLastX - currX) * 200., (mouseLastY - currY) * 200.);
 		paintGL();
 		updateGL();
 	}
 
-	// mouseLastX = 0.;
-	// mouseLastY = 0.;
-	// // only move the camera if we are not dragging
-	// else if(movingCamera)
-	// {
-	// 	camera.ProcessMouseMovement((mouseLastX - currX) * 200., (mouseLastY - currY) * 200.);
-	// 	paintGL();
-	// 	updateGL();
-	// }
-	//
-	// // Update
-	// mouseLastY = currY;
-	// mouseLastX = currX;
+	// Update
+	mouseLastY = currY;
+	mouseLastX = currX;
 } // RenderWidget::mouseMoveEvent()
 
 
 void RenderWidget::mouseReleaseEvent(QMouseEvent *event)
 	{ // RenderWidget::mouseReleaseEvent()
 	// now either translate or rotate object or light
-	mousePicker->dragging = false; // stop from dragging
+
+	// todo mouse picker
+	//mousePicker->dragging = false; // stop from dragging
 	movingCamera = false; // camera will not move anymore
 
 	} // RenderWidget::mouseReleaseEvent()
@@ -375,7 +384,6 @@ void RenderWidget::saveButtonPressed()
 void RenderWidget::timerUpdate()
 {
 
-
 	// Control Camera Movement
 	thisTime = QDateTime::currentDateTimeUtc();
 
@@ -395,25 +403,15 @@ void RenderWidget::timerUpdate()
 	if(fwd || lft || rht || bkw || upp || dwn)
 	{
 		updateNeeded = true;
-	}
+	}/* message */
 
 	// Control Playback
 	if(paused == false)
 	{
-		std::cout << "Timer Update" << '\n';
-
-		std::cout << "d: "<< delta << '\n';
-		std::cout << playbackSpeed << '\n';
-		std::cout << sim->interval << '\n';
-		std::cout << sim->numFrame << '\n';
-
 		// MS Conversion
 		cTime += delta * playbackSpeed;
 
-		std::cout << cTime << '\n';
-
 		int frame = (int)((cTime / (sim->interval * 1000))) % (int)(sim->numFrame);
-
 
 		std::cout << "frame " << frame << '\n';
 
@@ -422,8 +420,10 @@ void RenderWidget::timerUpdate()
 		{
 			cFrame = frame;
 			updateNeeded = true;
+
+			// do a physics update for the simulation
+			sim->Update(delta / 1000.);
 		}
-		std::cout << "Done" << '\n';
 	}
 
 	// Update Timer
@@ -432,6 +432,7 @@ void RenderWidget::timerUpdate()
 	// update the frame if needed
 	if(updateNeeded)
 	{
+		// draw to the screen
 		updateGL();
 	}
 }

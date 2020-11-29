@@ -56,13 +56,13 @@ private:
     RenderWidget *renderWidget;
     QPushButton  *loadButton;
     QTimer       *timer;
+    QCheckBox    *sphereCheck;
+    QCheckBox    *fixedCornersCheck;
+    QCheckBox    *windCheck;
     QSpinBox     *sphereSpinBox;
     QSpinBox     *sphereFrictionSpinBox;
     QSpinBox     *windSpeedSpinBox;
     QSpinBox     *gravitySpinBox;
-    QCheckBox    *sphereCheck;
-    QCheckBox    *windCheck;
-    QCheckBox    *fixedCornersCheck;
 
 // playback controls
 public slots:

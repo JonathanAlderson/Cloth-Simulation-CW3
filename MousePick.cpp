@@ -34,6 +34,8 @@ MousePick::MousePick(std::vector<double> *targetPoints, float size)
 
 glm::vec3 MousePick::drag(float x, float y, Camera *camera)
 {
+  std::cout << "Drag" << '\n';
+
   // make homogenius and work out the actual effect in world space
   glm::vec4 curr = glm::vec4(x, y, 0., 1.);
 
@@ -50,7 +52,7 @@ glm::vec3 MousePick::drag(float x, float y, Camera *camera)
 // Finds the point that has been clicked
 int MousePick::click(float x, float y, Camera *camera)
 {
-
+  std::cout << "Click" << '\n';
   // Find projection matrix
   float projM[16];
   glGetFloatv(GL_PROJECTION_MATRIX, projM);

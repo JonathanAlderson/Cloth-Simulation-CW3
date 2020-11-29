@@ -24,8 +24,8 @@ using namespace std;
 #include "camera.h"
 #include "PointMass.h"
 #include "Spring.h"
-#include "glm.hpp"
-#include "gtc/type_ptr.hpp"
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 class Wind
 {
