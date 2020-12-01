@@ -207,6 +207,10 @@ void MasterWidget::keyPressEvent(QKeyEvent* event)
     case Qt::Key_Shift:
       shiftHeld = true;
       break;
+    // Turn lock key on and off
+    case Qt::Key_L:
+      renderWidget->lockHeld = true;
+      break;
   }
 
   // Default
@@ -250,6 +254,10 @@ void MasterWidget::keyReleaseEvent(QKeyEvent* event)
       renderWidget->upp = false;
       renderWidget->dwn = false;
       break;
+    // Turn lock key on and off
+    case Qt::Key_L:
+      renderWidget->lockHeld = false;
+      break;
   }
 
   // Default
@@ -286,6 +294,7 @@ void MasterWidget::play()
 {
   renderWidget->paused = false;
 }
+
 
 // Changes the boolean
 void MasterWidget::playPause()

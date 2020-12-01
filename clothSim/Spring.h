@@ -45,7 +45,8 @@ class Spring
 public:
   ~Spring();   // destructor
 
-  Spring(PointMass *a, PointMass *b, float springK, float springD);    // empty constructor
+  // constructor
+  Spring(PointMass *a, PointMass *b, float springK, float springD);
 
   // resets all the forces acting on the PointMass
   void Reset();

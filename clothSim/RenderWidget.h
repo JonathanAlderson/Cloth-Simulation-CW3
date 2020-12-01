@@ -37,6 +37,9 @@ class RenderWidget : public QGLWidget
 	// for resolving clicks on the screen to 3D coordinates
 	MousePick *mousePicker;
 
+	// for making points locked in place
+	bool lockHeld;
+
 	// translation in window x,y
 	GLfloat lastX, lastY;
 

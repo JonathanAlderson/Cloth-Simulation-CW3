@@ -60,6 +60,9 @@ class Cloth
     // Show the current state of the cloth
     void Render();
 
+    // gives a force like you are dragging part of the cloth
+    void ApplyForce(Cartesian3 forceIn);
+
     // which point we are dragging
     unsigned int activePoint;
 };

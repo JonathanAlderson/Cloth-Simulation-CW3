@@ -23,7 +23,7 @@
 
 #include "MousePick.h"
 
-MousePick::MousePick(std::vector<double> *targetPoints, float size)
+MousePick::MousePick(std::vector<Cartesian3> *targetPoints, float size)
 {
   this->targetPoints = targetPoints;
   dragging = false;
@@ -32,7 +32,12 @@ MousePick::MousePick(std::vector<double> *targetPoints, float size)
   this->size = size;
 }
 
-glm::vec3 MousePick::drag(float x, float y, Camera *camera)
+void MousePick::UpdateTargetPoints(std::vector<Cartesian3> *targetPoints)
+{
+  this->targetPoints = targetPoints;
+}
+
+Cartesian3 MousePick::drag(float x, float y, Camera *camera)
 {
   std::cout << "Drag" << '\n';
 
@@ -46,7 +51,9 @@ glm::vec3 MousePick::drag(float x, float y, Camera *camera)
   glm::vec3 change = start - curr3;
   start = curr3;
 
-  return change;
+  Cartesian3 ret = Cartesian3(change.x, change.y, change.z);
+
+  return ret;
 }
 
 // Finds the point that has been clicked
@@ -84,11 +91,13 @@ int MousePick::click(float x, float y, Camera *camera)
   closest = -1;
 
   // Test every point to see which is the closest
-  for(unsigned int i = 0; i < (targetPoints->size() / 3); i++)
+  for(unsigned int i = 0; i < targetPoints->size(); i++)
   {
-    sphereCenter4 = glm::vec4(targetPoints[0][3 * i]     - rayStart.x,
-                              targetPoints[0][3 * i + 1] - rayStart.y,
-                              targetPoints[0][3 * i + 2] - rayStart.z,
+    std::cout << "Target: " << targetPoints[0][i] << '\n';
+
+    sphereCenter4 = glm::vec4(targetPoints[0][i].x     - rayStart.x,
+                              targetPoints[0][i].y - rayStart.y,
+                              targetPoints[0][i].z - rayStart.z,
                               1.0);
 
     // calculate point with model view matrix
@@ -111,12 +120,12 @@ int MousePick::click(float x, float y, Camera *camera)
     // If a point has intersected
     if(intersect == true)
     {
-      std::cout << "" << '\n';
       dragging = true;
       start = glm::vec3(x, y, 0.);
       // keep track of which point is closest to the camera
       if(sphereCenter4.z < closestDist)
       {
+        std::cout << "Found Point" << '\n';
         closest = i;
         closestDist = sphereCenter4.z;
       }

@@ -31,9 +31,13 @@ RenderWidget::RenderWidget(char *filename, MasterWidget *parent)
 		// load a new file
 		if(strlen(filename) == 0){sim = new Simulation(); }
 		else {sim = new Simulation(filename); }
+		sim->FindGlobalPosition(&camera);
 
 		// set default values
 		whichButton = -1;
+
+		// if we click on a point when this is active it becomes stationary
+		lockHeld = false;
 
 		// will change when scolling
 		//size = bvh->boundingBoxSize;
@@ -65,7 +69,7 @@ RenderWidget::RenderWidget(char *filename, MasterWidget *parent)
 
 		// initialise the mouse clicker
 		// todo mouse pick
-		//mousePicker = new MousePick(&(sim->globalPositions), 1.0);
+		mousePicker = new MousePick(&(sim->globalPositions), 1.0);
 
 		// Construct Camera with default values
 		camera = Camera();
@@ -138,7 +142,8 @@ void RenderWidget::updatePerspective()
 // called every time the widget needs painting
 void RenderWidget::paintGL()
 	{ // RenderWidget::paintGL()
-	std::cout << "Paint GL" << '\n';
+	std::cout << "Update" << '\n';
+
 	// clear the buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -196,7 +201,6 @@ void RenderWidget::paintGL()
 void RenderWidget::mousePressEvent(QMouseEvent *event)
 	{ // RenderWidget::mousePressEvent()
 	// store the button for future reference
-
 	whichButton = event->button();
 
 	// find the minimum of height & width
@@ -212,20 +216,33 @@ void RenderWidget::mousePressEvent(QMouseEvent *event)
 	}
 	camera.updateCameraVectors();
 
-	// Perform Mouse Picking -1 if no match
-	// todo mouse pick
-	// int clicked = mousePicker->click(currX, currY, &camera);
-	//
-	// bool addToList = false;
-  // // if clicked on nothign clear list
-	// if(clicked == -1)
-	// {
-	// 	sim->cloth->activePoint = -1;
-	// }
-	// else
-	// {
-	// 	sim->cloth->activePoint = clicked;
-	// }
+	//Perform Mouse Picking -1 if no match
+	int clicked = mousePicker->click(currX, currY, &camera);
+
+  // if clicked on nothign clear list
+	if(clicked == -1)
+	{
+		sim->cloth->activePoint = -1;
+	}
+	else
+	{
+		sim->cloth->activePoint = clicked;
+		// if we are holding the L button, make the point unable to be clicked
+		if(lockHeld)
+		{
+			if(sim->cloth->points[clicked].fixed == true)
+			{
+				sim->cloth->points[clicked].fixed = false;
+				sim->cloth->points[clicked].CalculateColour();
+			}
+			else
+		  {
+				sim->cloth->points[clicked].fixed = true;
+				sim->cloth->points[clicked].CalculateColour();
+			}
+
+		}
+	}
 
 	// So we can see the newly highlighted joint
 	updateGL();
@@ -240,56 +257,53 @@ void RenderWidget::mouseMoveEvent(QMouseEvent *event)
 	float currX = (2.0 * event->x() - width()) / width();
 	float currY = (height() - 2.0 * event->y() ) / height();
 
-	// rotate the camera if clicking
-	// now either translate or rotate object or light
 
-	// todo mouse move
-	// if(mousePicker->dragging == true)
-	// {
-	// 	glm::vec3 mouseMove = mousePicker->drag(currX, currY, &camera);
-	//
-	// 	mouseMove.x = -mouseMove.x;
-	// 	mouseMove.y = -mouseMove.y;
-	//
-	// 	// TODO make this a sensetivity
-	// 	mouseMove *= 1000.0;
-	//
-	// 	//sim->cloth->MovePoint(mouseMove);
-	//
-	// 	// if(doneOnce != true)
-	// 	// {
-	// 	//
-	// 	// 	std::cout << "Mouse Movement" << '\n';
-	// 	// 	for(int i = 0; i < 3; i++)
-	// 	// 	{
-	// 	// 		std::cout << mouseMove[i] << "  ";
-	// 	// 	}
-	// 	// 	// global positoin before
-	// 	// 	std::cout << "Global Positoin" << '\n';
-	// 	// 	std::cout << bvh->joints[22]->name << '\n';
-	// 	// 	std::cout << bvh->globalPositions[22*3] << " " << bvh->globalPositions[22*3 + 1] << " " << bvh->globalPositions[22*3 + 2] << '\n';
-	// 	//
-	// 	// 	// move one joint
-	// 	// 	bvh->MoveJoint(mousePicker->closest, mouseMove, 1);
-	// 	//
-	// 	//
-	// 	// 	doneOnce = true;
-	// 	// }
-	// 	// else
-	// 	// {
-	// 	// 	std::cout << "Global Positoin After" << '\n';
-	// 	// 	std::cout << bvh->joints[22]->name << '\n';
-	// 	// 	std::cout << bvh->globalPositions[22*3] << " " << bvh->globalPositions[22*3 + 1] << " " << bvh->globalPositions[22*3 + 2] << '\n';
-	// 	//
-	// 	// }
-	//
-	// 	// TODO
-	// 	paintGL();
-	// 	updateGL();
-	// }
+	if(mousePicker->dragging == true)
+	{
+		Cartesian3 mouseMove = mousePicker->drag(currX, currY, &camera);
+
+		mouseMove.x = -mouseMove.x;
+		mouseMove.y = -mouseMove.y;
+
+		// TODO make this a sensetivity
+		//mouseMove = 1000.0;
+
+		sim->cloth->ApplyForce(mouseMove);
+
+		// if(doneOnce != true)
+		// {
+		//
+		// 	std::cout << "Mouse Movement" << '\n';
+		// 	for(int i = 0; i < 3; i++)
+		// 	{
+		// 		std::cout << mouseMove[i] << "  ";
+		// 	}
+		// 	// global positoin before
+		// 	std::cout << "Global Positoin" << '\n';
+		// 	std::cout << bvh->joints[22]->name << '\n';
+		// 	std::cout << bvh->globalPositions[22*3] << " " << bvh->globalPositions[22*3 + 1] << " " << bvh->globalPositions[22*3 + 2] << '\n';
+		//
+		// 	// move one joint
+		// 	bvh->MoveJoint(mousePicker->closest, mouseMove, 1);
+		//
+		//
+		// 	doneOnce = true;
+		// }
+		// else
+		// {
+		// 	std::cout << "Global Positoin After" << '\n';
+		// 	std::cout << bvh->joints[22]->name << '\n';
+		// 	std::cout << bvh->globalPositions[22*3] << " " << bvh->globalPositions[22*3 + 1] << " " << bvh->globalPositions[22*3 + 2] << '\n';
+		//
+		// }
+
+		// TODO
+		paintGL();
+		updateGL();
+	}
 
 	// only move the camera if we are not dragging
-	if(movingCamera)
+	if(mousePicker->dragging == false && movingCamera)
 	{
 		std::cout << "Moving Camera" << '\n';
 		camera.ProcessMouseMovement((mouseLastX - currX) * 200., (mouseLastY - currY) * 200.);
@@ -307,8 +321,8 @@ void RenderWidget::mouseReleaseEvent(QMouseEvent *event)
 	{ // RenderWidget::mouseReleaseEvent()
 	// now either translate or rotate object or light
 
-	// todo mouse picker
-	//mousePicker->dragging = false; // stop from dragging
+
+	mousePicker->dragging = false; // stop from dragging
 	movingCamera = false; // camera will not move anymore
 
 	} // RenderWidget::mouseReleaseEvent()
@@ -341,10 +355,9 @@ void RenderWidget::loadButtonPressed()
 		cFrame = 0;
 
 		sim = new Simulation(newFileName.toStdString().c_str());
-
+		sim->FindGlobalPosition(&camera);
 		// initialise the mouse clicker
-		// todo mousepick
-		//mousePicker = new MousePick(&(bvh->globalPositions), 1.0);
+		mousePicker = new MousePick(&(sim->globalPositions), 1.0);
 
 		// reset the camera here
 		updateGL();
@@ -431,5 +444,9 @@ void RenderWidget::timerUpdate()
 	{
 		// draw to the screen
 		updateGL();
+
+		// update the global positions
+		sim->FindGlobalPosition(&camera);
+		mousePicker->UpdateTargetPoints(&(sim->globalPositions));
 	}
 }

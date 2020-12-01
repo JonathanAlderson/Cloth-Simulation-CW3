@@ -90,7 +90,12 @@ void  Simulation::Clear()
 // Calculates where we are allowed to click
 void Simulation::FindGlobalPosition(Camera *camera)
 {
-  globalPositions.push_back(Cartesian3(1., 1., 1.));
+  // clear positions and add current values
+  globalPositions.clear();
+  for(unsigned int i = 0; i < cloth->points.size(); i++)
+  {
+    globalPositions.push_back(cloth->points[i].pos);
+  }
 }
 
 // loads a file in and you know, loads it in and stuff
@@ -112,22 +117,17 @@ void Simulation::SaveFile(std::string fileName)
 }
 
 // updates all the physics for all the items in the scene
+// and find out what the global positions are
 void Simulation::Update(float dT)
 {
   // Calcualte all the new positions and velocities
   // of the items in the scene
-
-  std::cout << "\n\n\n-------------------------" << std::endl;
-  std::cout << "Simulation Update" << '\n';
-
-  std::cout << "Spings: " << cloth->springs.size() << '\n';
   for(unsigned int i = 0; i < cloth->springs.size(); i++)
   {
      cloth->springs[i].Update(dT);
   }
 
   // for each pointMass, find the current forces acting on it
-  std::cout << "PointsMasses: " << cloth->points.size() << '\n';
   for(unsigned int i = 0; i < cloth->points.size(); i++)
   {
      cloth->points[i].CalculateTotalForce();
@@ -164,15 +164,6 @@ void Simulation::EulerUpdate(float dT)
       fNet = cloth->points[i].cForce;
       m    = cloth->points[i].mass;
 
-      std::cout << "\n\nEuler Update: "<< i << '\n';
-
-      std::cout << "rt1: " << rt1 << std::endl;
-      std::cout << "at1: " << at1 << std::endl;
-      std::cout << "vt1: " << vt1 << std::endl;
-      std::cout << "fNet: " << fNet << std::endl;
-      std::cout << "m: " << m << std::endl;
-      std::cout << "dt: " << dT << '\n';
-
       // update position
       cloth->points[i].pos = rt1 + vt1 * dT;
 
@@ -181,11 +172,6 @@ void Simulation::EulerUpdate(float dT)
 
       // update velocity
       cloth->points[i].vel = vt1 + (fNet / m) * dT;
-
-      std::cout << "pos: " << cloth->points[i].pos << '\n';
-      std::cout << "acc: "<< cloth->points[i].acc << '\n';
-      std::cout << "vel: " << cloth->points[i].vel  << '\n';
-
     }
   }
 }

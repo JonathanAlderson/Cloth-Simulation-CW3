@@ -13,7 +13,7 @@
 
 #ifndef MOUSEPICK_H
 #define MOUSEPICK_H
-#define GLM_ENABLE_EXPERIMENTAL 
+#define GLM_ENABLE_EXPERIMENTAL
 
 #include "Cartesian3.h"
 #include "camera.h"
@@ -26,18 +26,20 @@ class MousePick
 {
 public:
 
-  MousePick(std::vector<double> *targetPoints, float size);
+  MousePick(std::vector<Cartesian3> *targetPoints, float size);
+
+  void UpdateTargetPoints(std::vector<Cartesian3> *targetPoints);
 
   int click(float x, float y, Camera *camera);
 
-  glm::vec3 drag(float x, float y, Camera *camera);
+  Cartesian3 drag(float x, float y, Camera *camera);
 
   bool dragging;
   int closest;
   glm::vec3 start;
   float size;
 
-  std::vector<double> *targetPoints;
+  std::vector<Cartesian3> *targetPoints;
 
 };
 

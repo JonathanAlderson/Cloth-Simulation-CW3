@@ -16,13 +16,7 @@
 
 #include "Spring.h"
 
-
-Spring::~Spring()
-{
-  // I don't know how to write destructors properly
-}
-
-Spring(PointMass *a, PointMass *b, float springK, float springD)
+Spring::Spring(PointMass *a, PointMass *b, float springK, float springD)
 {
     // set variables
     pmA = a;
@@ -45,6 +39,12 @@ Spring(PointMass *a, PointMass *b, float springK, float springD)
     // find the inital colour
     CalculateColour();
 }
+
+Spring::~Spring()
+{
+  // I don't know how to write destructors properly
+}
+
 
 void Spring::Update(float dt)
 {
@@ -70,11 +70,6 @@ void Spring::Update(float dt)
   float dot = vels.x * unitVec.x + vels.y * unitVec.y + vels.z * unitVec.z;
   force = force +(unitVec * (-dampingConst * dot));
 
-  std::cout << "\n\n\n-------------------------" << std::endl;
-  std::cout << "vels: " << vels << std::endl;
-  std::cout << "dot: " << dot << std::endl;
-  std::cout << "Spring Force: " << force << '\n';
-  std::cout << "\n\n\n-------------------------" << std::endl;
 
   // finally update the colour
   CalculateColour();
