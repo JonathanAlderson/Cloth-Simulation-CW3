@@ -31,9 +31,6 @@ RenderWidget::RenderWidget(char *filename, MasterWidget *parent)
 		// load a new file
 		if(strlen(filename) == 0){sim = new Simulation(); }
 		else {sim = new Simulation(filename); }
-		//bvh->FindMinMax();
-		std::cout << "Reading: ";
-		std::cout << filename << '\n';
 
 		// set default values
 		whichButton = -1;

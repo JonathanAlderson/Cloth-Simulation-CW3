@@ -49,23 +49,43 @@ void Spring::Update(float dt)
 {
   // here is where the difficult physics comes in
 
+  bool dampening = true;
+
   // find the current length of the spring
   Cartesian3 p1 = pmA->pos;
   Cartesian3 p2 = pmB->pos;
 
+  Cartesian3 p1Vel = pmA->vel;
+  Cartesian3 p2Vel = pmB->vel;
+
   lc = p1.distance(p2);
 
   // calculate the force
-  force = (p2 - p1).normalise() * (-springConst * (lc - lr));
+  Cartesian3 unitVec = (p2 - p1).normalise();
+
+  // without dampening
+  if(dampening == false)
+  {
+    force = unitVec * (-springConst * (lc - lr));
+  }
+  // with dampening
+  else
+  {
+    // we need to do a dot product, couldn't get it to add to the header file properly
+    Cartesian3 vels = (p2Vel - p1Vel);
+    float dot = vels.x * unitVec.x + vels.y * unitVec.y + vels.z * unitVec.z;
+    force = unitVec * (-springConst * dot);
+
+    std::cout << "\n\n\n-------------------------" << std::endl;
+    std::cout << "vels: " << vels << std::endl;
+    std::cout << "dot: " << dot << std::endl;
+    std::cout << "Spring Force: " << force << '\n';
+    std::cout << "\n\n\n-------------------------" << std::endl;
+  }
+
 
   // finally update the colour
   CalculateColour();
-
-  std::cout << "Calculating Spring Force" << '\n';
-  std::cout << (p2 - p1).normalise() << '\n';
-  std::cout << (-springConst * (lc - lr)) << '\n';
-
-  std::cout << "Spring: " << force << '\n';
 }
 
 // finds colour based off forces

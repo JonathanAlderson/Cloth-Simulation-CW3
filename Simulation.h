@@ -37,7 +37,6 @@ using namespace std;
 #endif
 
 
-
 class Simulation
 {
 // constructors and destructors
@@ -46,15 +45,16 @@ public:
 
     Simulation();    // empty constructor
 
-    Simulation( const char * objFileName ); // filename constructor
+    Simulation(const char * objFileName); // filename constructor
 
     // setup functions
     void Clear();
 
-    void Load( const char * objFileName );
+    void Load(const char * objFileName );
 
     // lets initialise this innit
     void Init();
+
 
 public:
   // all our public variables and funcitons

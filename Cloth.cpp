@@ -12,6 +12,7 @@
 ///////////////////////////////////////////////////
 
 #include "Cloth.h" // we might be needing this
+#include "../objLoader/OBJ_Loader.h"
 
 
 // Destructor
@@ -21,42 +22,58 @@ Cloth::~Cloth()
 }
 
 // constructor
-Cloth::Cloth(vector<Cartesian3> *positionsIn)
+Cloth::Cloth(const char *filename)
 {
+  // Initialize Loader
+  // Load .obj File
+  objl::Loader Loader;
+  bool loadout = Loader.LoadFile(filename);
+  objl::Mesh curMesh = Loader.LoadedMeshes[0];
+
+  // constants
   float ballMasses = 1.;
   float springConstant = 10.;
 
-  springs.reserve(2);
-  points.reserve(positionsIn->size());
+  // reserve the correct sized vectors to avoid horrible memory problems
+  points.reserve(curMesh.Vertices.size());
+  springs.reserve(curMesh.Indices.size());
 
-  for(unsigned int i = 0; i < positionsIn->size(); i++)
+  // temp variables for reading in
+  Cartesian3 tempPos;
+  unsigned int a;
+  unsigned int b;
+
+  // read in all the verticies from the file and turn into point masses
+  for (unsigned int j = 0; j < curMesh.Vertices.size(); j++)
   {
-    // add a new ball at this point
-    points.push_back(PointMass(positionsIn[0][i], ballMasses));
+    // construct a cartesian3
+    tempPos = Cartesian3(curMesh.Vertices[j].Position.X,
+                         curMesh.Vertices[j].Position.Y,
+                         curMesh.Vertices[j].Position.Z);
+
+    points.push_back(PointMass(tempPos, ballMasses));
   }
 
-  std::cout << "Cloth: " << points.size() << '\n';
+  // read in all the edges from the file and make them springs
+  for (unsigned int j = 0; j < curMesh.Indices.size(); j+=1)
+  {
+    // find which indices connect the two
+    a = curMesh.Indices[j];
+    b = curMesh.Indices[j + 1];
+    springs.push_back(Spring(&points[a], &points[b], springConstant));
 
-  // add a temp spring
-  //springs.push_back(Spring(&points[0], &points[1], springConstant));
+    // also tell the PointMasses which springs they are attached to
+    points[a].springs.push_back(&springs[j]);
+    points[b].springs.push_back(&springs[j]);
+  }
 
-  springs.push_back(Spring(&points[1], &points[2], springConstant));
-  points[1].springs.push_back(&springs[0]);
-  points[2].springs.push_back(&springs[0]);
 
-  springs.push_back(Spring(&points[0], &points[1], springConstant));
-  points[0].springs.push_back(&springs[1]);
-  points[1].springs.push_back(&springs[1]);
+  points[0].fixed = true;
+  // points[2].fixed = true;
 
-  //points[0].fixed = true;
-  points[2].fixed = true;
   // give a temporary force to one of the point masses
-  points[0].eForces.push_back(Cartesian3(0., -9.81, 0.));
   points[1].eForces.push_back(Cartesian3(0., -9.81, 0.));
-
-
-
-
+  points[2].eForces.push_back(Cartesian3(0., -9.81, 0.));
 
   // calculate all the colours of the points
   for(unsigned int i = 0; i < points.size(); i++)

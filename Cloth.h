@@ -45,7 +45,7 @@ class Cloth
   public:
       ~Cloth();   // destructor
 
-      Cloth(vector<Cartesian3> *positions);    // empty constructor
+      Cloth(const char *filename);    // empty constructor
 
       // setup functions
       void Reset();

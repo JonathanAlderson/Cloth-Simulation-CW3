@@ -55,7 +55,7 @@ void PointMass::CalculateTotalForce()
 {
   cForce = Cartesian3(0., 0., 0.);
 
-  std::cout << "\nCalc total force: " << '\n';
+  std::cout << "    PointMassFroce: " << '\n';
 
   // sum up the external forces acting on the point mass
   for(unsigned int i = 0; i < eForces.size(); i++)
@@ -71,9 +71,9 @@ void PointMass::CalculateTotalForce()
     // pmB --> Right Hand Size
     else                         cForce = cForce + springs[i]->force;
 
-    std::cout << "Point Mass Referncing Spring" << '\n';
-    std::cout << springs[i]->springConst << '\n';
-    std::cout << springs[i]->force << '\n';
+    std::cout << "    Point Mass Referncing Spring" << '\n';
+    std::cout << "   " << springs[i]->springConst << '\n';
+    std::cout << "    " << springs[i]->force << '\n';
    }
 
    std::cout << "PM Total Force: " << cForce << '\n';

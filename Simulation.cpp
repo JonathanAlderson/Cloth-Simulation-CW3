@@ -60,8 +60,8 @@ Simulation::Simulation(const char *simFileName)
   windSpeed      = 1.;
   gravity        = 10.; // close enough to 9.81
 
-  // finally load the file
-  Load(simFileName);
+  // init cloth with obj file
+  cloth = new Cloth(simFileName);
 
   Init();
 }
@@ -69,19 +69,6 @@ Simulation::Simulation(const char *simFileName)
 // set everything up how we like
 void Simulation::Init()
 {
-  // make a test mesh that's very small
-  Cartesian3 a = Cartesian3(0., 1., 0.);
-  Cartesian3 b = Cartesian3(1., 1., 0.);
-  Cartesian3 c = Cartesian3(2., 1., 0.);
-
-  std::vector<Cartesian3> clothMesh;
-  clothMesh.push_back(a);
-  clothMesh.push_back(b);
-  clothMesh.push_back(c);
-
-  cloth = new Cloth(&clothMesh);
-
-  std::cout << "Sim Init" << '\n';
 }
 
 // Reset Function to Dump All The Clears In
@@ -107,9 +94,8 @@ void Simulation::FindGlobalPosition(Camera *camera)
 }
 
 // loads a file in and you know, loads it in and stuff
-void Simulation::Load(char const *)
+void Simulation::Load(const char *filename)
 {
-
 }
 
 // saves the info on the current frame as a file
