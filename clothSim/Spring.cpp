@@ -22,7 +22,7 @@ Spring::~Spring()
   // I don't know how to write destructors properly
 }
 
-Spring::Spring(PointMass *a, PointMass *b, float springK, float springD)
+Spring(PointMass *a, PointMass *b, float springK, float springD)
 {
     // set variables
     pmA = a;
