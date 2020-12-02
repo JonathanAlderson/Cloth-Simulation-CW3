@@ -209,7 +209,7 @@ void Cloth::Render()
       c = points[cIdx].pos;
 
       // compute and set normal
-      norm = ((c - a).cross(c - b)).normalise();
+      norm = ((a - c).cross(a - b)).normalise();
       glNormal3f(norm.x, norm.y, norm.z);
 
 
@@ -217,7 +217,6 @@ void Cloth::Render()
       // set the texture coordinates
       if(useTextures)
       {
-        std::cout << "Using textures" << '\n';
         glTexCoord2f(texCoords[aIdx].u, texCoords[aIdx].v);
         glVertex3f(a.x, a.y, a.z);
         glTexCoord2f(texCoords[bIdx].u, texCoords[bIdx].v);

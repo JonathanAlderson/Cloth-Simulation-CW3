@@ -101,7 +101,7 @@ void RenderWidget::initializeGL()
 	glEnable(GL_LIGHTING);
 	glEnable(GL_COLOR_MATERIAL);
   glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE);
-	GLfloat lightPos0[] = {-2.f, 2.f, -2.f};
+	GLfloat lightPos0[] = {-2.f, 2.f, 2.f};
 	glLightfv(GL_LIGHT0, GL_POSITION, lightPos0);
 	glColor3f(1., 1., 1.);
 
@@ -117,7 +117,7 @@ void RenderWidget::initializeGL()
 } // RenderWidget::initializeGL()
 
 // routine to transfer assets to GPU
-// Hamish made this method 
+// Hamish made this method
 void RenderWidget::TransferTexture()
 { // TransferAssetsToGPU()
     // when this is called, it transfers assets to the GPU.
@@ -338,24 +338,21 @@ void RenderWidget::mouseMoveEvent(QMouseEvent *event)
 		// 	std::cout << bvh->globalPositions[22*3] << " " << bvh->globalPositions[22*3 + 1] << " " << bvh->globalPositions[22*3 + 2] << '\n';
 		//
 		// }
-
-		// TODO
-		paintGL();
-		updateGL();
 	}
 
 	// only move the camera if we are not dragging
 	if(mousePicker->dragging == false && movingCamera)
 	{
-		std::cout << "Moving Camera" << '\n';
-		camera.ProcessMouseMovement((mouseLastX - currX) * 200., (mouseLastY - currY) * 200.);
-		paintGL();
 		updateGL();
+		camera.ProcessMouseMovement((mouseLastX - currX) * 200., (mouseLastY - currY) * 200.);
 	}
 
 	// Update
 	mouseLastY = currY;
 	mouseLastX = currX;
+
+
+
 } // RenderWidget::mouseMoveEvent()
 
 
