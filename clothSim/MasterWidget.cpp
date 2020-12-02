@@ -47,7 +47,9 @@ MasterWidget::MasterWidget(char *filename, QWidget *parent)
     QGroupBox   *settingsGroup         = new QGroupBox(tr("Settings"));
                  sphereCheck           = new QCheckBox();
                  fixedCornersCheck     = new QCheckBox();
+                 wireframeCheck        = new QCheckBox();
                  windCheck             = new QCheckBox();
+                 texturesCheck         = new QCheckBox();
                  sphereSpinBox         = new QSpinBox();
     QLabel      *sphereSpinSpeedLabel  = new QLabel(tr("Spin Speed"));
                  sphereFrictionSpinBox = new QSpinBox();
@@ -61,6 +63,8 @@ MasterWidget::MasterWidget(char *filename, QWidget *parent)
     sphereCheck          ->setText("Sphere");
     fixedCornersCheck    ->setText("Fixed Corners");
     windCheck            ->setText("Wind");
+    wireframeCheck       ->setText("Wireframe");
+    texturesCheck        ->setText("Textures");
     sphereSpinBox        ->setRange(0, 1000);
     sphereSpinBox        ->setSingleStep(1);
     sphereSpinBox        ->setValue(1);
@@ -78,6 +82,7 @@ MasterWidget::MasterWidget(char *filename, QWidget *parent)
     settingsLayout->addWidget(sphereCheck);
     settingsLayout->addWidget(fixedCornersCheck);
     settingsLayout->addWidget(windCheck);
+    settingsLayout->addWidget(wireframeCheck);
     settingsLayout->addWidget(sphereSpinSpeedLabel);
     settingsLayout->addWidget(sphereSpinBox);
     settingsLayout->addWidget(sphereFrictionLabel);
@@ -155,6 +160,8 @@ MasterWidget::MasterWidget(char *filename, QWidget *parent)
     connect(fixedCornersCheck,     SIGNAL(pressed()),      this,         SLOT(toggleFixedCorners()));
     connect(sphereCheck,           SIGNAL(pressed()),      this,         SLOT(toggleSphere()));
     connect(windCheck,             SIGNAL(pressed()),      this,         SLOT(toggleWind()));
+    connect(wireframeCheck,        SIGNAL(pressed()),      this,         SLOT(toggleWireframe()));
+    connect(texturesCheck,        SIGNAL(pressed()),      this,         SLOT(toggleTextures()));
 
     timer->start(16);
 }
@@ -326,6 +333,37 @@ void MasterWidget::toggleFixedCorners()
   {
     renderWidget->sim->fixedCorners = 0;
     fixedCornersCheck->setChecked(true);
+  }
+}
+
+
+// changes the rendering mode for the cloth
+void MasterWidget::toggleWireframe()
+{
+  if(renderWidget->sim->cloth->wireframeRender == 0)
+  {
+    renderWidget->sim->cloth->wireframeRender = 1;
+    wireframeCheck->setChecked(true);
+  }
+  else
+  {
+    renderWidget->sim->cloth->wireframeRender = 0;
+    wireframeCheck->setChecked(false);
+  }
+}
+
+// changes the rendering mode to include textures
+void MasterWidget::toggleTextures()
+{
+  if(renderWidget->sim->cloth->useTextures == 0)
+  {
+    renderWidget->sim->cloth->useTextures = 1;
+    texturesCheck->setChecked(true);
+  }
+  else
+  {
+    renderWidget->sim->cloth->useTextures = 0;
+    texturesCheck->setChecked(false);
   }
 }
 

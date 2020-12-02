@@ -59,6 +59,8 @@ private:
     QCheckBox    *sphereCheck;
     QCheckBox    *fixedCornersCheck;
     QCheckBox    *windCheck;
+    QCheckBox    *wireframeCheck;
+    QCheckBox    *texturesCheck;
     QSpinBox     *sphereSpinBox;
     QSpinBox     *sphereFrictionSpinBox;
     QSpinBox     *windSpeedSpinBox;
@@ -71,6 +73,8 @@ public slots:
   void stop();
   void playPause();
   void toggleSphere();
+  void toggleWireframe();
+  void toggleTextures();
   void toggleWind();
   void toggleFixedCorners();
   void sphereFrictionUpdate(int i);

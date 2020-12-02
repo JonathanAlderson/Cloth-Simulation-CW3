@@ -51,8 +51,13 @@ class Cloth
       void Reset();
 
   public:
-    vector<PointMass> points;
-    vector<Spring> springs;
+    vector<PointMass> points;          // pointmasses
+    vector<Spring> springs;            // connecting springs
+    vector<unsigned int> vertRef;     // for rendering cloth
+
+    // changes the rendering mode from cloth to rods and srpings
+    bool wireframeRender;
+    bool useTextures;
 
     // perform one step of physics calculations
     void Update(float dT);

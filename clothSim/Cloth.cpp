@@ -30,6 +30,9 @@ Cloth::Cloth(const char *filename)
   bool loadout = Loader.LoadFile(filename);
   objl::Mesh curMesh = Loader.LoadedMeshes[0];
 
+  // rendering mode
+  wireframeRender = false;
+
   // constants
   float ballMasses = 1.;
   float springConstant = 10.;
@@ -47,7 +50,7 @@ Cloth::Cloth(const char *filename)
   std::vector<Cartesian3> uniqueVert;
   std::vector<Cartesian3> uniqueSprings;
   std::vector<Cartesian3> faceSprings;  // springs on the current face
-  std::vector<unsigned int> vertRef;    // unique references
+  vertRef.clear();                      // unique references
   int idx;
 
   // add all unique verticies to a data structure
@@ -170,16 +173,25 @@ void Cloth::ApplyForce(Cartesian3 movement)
 
 void Cloth::Render()
 {
-  // Render All The Point Masses
-  for(unsigned int i = 0; i < points.size(); i++)
+  if(wireframeRender)
   {
-    points[i].Render();
+    // Render All The Point Masses
+    for(unsigned int i = 0; i < points.size(); i++){ points[i].Render(); }
+    // Render All The Springs Between Them
+    for(unsigned int i = 0; i < springs.size(); i++){ springs[i].Render(); }
   }
-
-  // Render All The Springs Between Them
-  for(unsigned int i = 0; i < springs.size(); i++)
+  // render with texutres and all that jazz
+  else
   {
-
-    springs[i].Render();
+    glBegin(GL_TRIANGLES);
+    Cartesian3 thisPos;
+    std::cout << "\n\n\n-------------------------" << std::endl;
+    for(unsigned int i = 0; i < vertRef.size(); i++)
+    {
+      glColor3f((float)rand()/(float)RAND_MAX, (float)rand()/(float)RAND_MAX, (float)rand()/(float)RAND_MAX);
+      thisPos = points[vertRef[i]].pos;
+      glVertex3f(thisPos.x, thisPos.y, thisPos.z);
+    }
+    glEnd();
   }
 }
