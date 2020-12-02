@@ -78,6 +78,9 @@ Cloth::Cloth(const char *filename)
       uniqueVert.push_back(tempPos);
       vertRef.push_back(uniqueVert.size() - 1);
       points.push_back(PointMass(uniqueVert.back(), ballMasses));
+
+      // also at this point get the texture coordiantes
+      texCoords.push_back(Tex(curMesh.Vertices[j].TextureCoordinate.X, curMesh.Vertices[j].TextureCoordinate.Y));
     }
   }
 
@@ -180,18 +183,59 @@ void Cloth::Render()
     // Render All The Springs Between Them
     for(unsigned int i = 0; i < springs.size(); i++){ springs[i].Render(); }
   }
-  // render with texutres and all that jazz
   else
   {
+    // render with texutres and all that jazz
     glBegin(GL_TRIANGLES);
-    Cartesian3 thisPos;
-    std::cout << "\n\n\n-------------------------" << std::endl;
-    for(unsigned int i = 0; i < vertRef.size(); i++)
+
+    // random colours
+    //glColor3f((float)rand()/(float)RAND_MAX, (float)rand()/(float)RAND_MAX, (float)rand()/(float)RAND_MAX);
+    glColor3f(1., 1., 1.);
+    Cartesian3 a;
+    Cartesian3 b;
+    Cartesian3 c;
+    unsigned int aIdx;
+    unsigned int bIdx;
+    unsigned int cIdx;
+    Cartesian3 norm;
+    for(unsigned int i = 0; i < vertRef.size(); i+=3)
     {
-      glColor3f((float)rand()/(float)RAND_MAX, (float)rand()/(float)RAND_MAX, (float)rand()/(float)RAND_MAX);
-      thisPos = points[vertRef[i]].pos;
-      glVertex3f(thisPos.x, thisPos.y, thisPos.z);
+      // find a, b, c that make up the traingle
+      aIdx = vertRef[i    ];
+      bIdx = vertRef[i + 1];
+      cIdx = vertRef[i + 2];
+      a = points[aIdx].pos;
+      b = points[bIdx].pos;
+      c = points[cIdx].pos;
+
+      // compute and set normal
+      norm = ((c - a).cross(c - b)).normalise();
+      glNormal3f(norm.x, norm.y, norm.z);
+
+
+      // render one triangle
+      // set the texture coordinates
+      if(useTextures)
+      {
+        std::cout << "Using textures" << '\n';
+        glTexCoord2f(texCoords[aIdx].u, texCoords[aIdx].v);
+        glVertex3f(a.x, a.y, a.z);
+        glTexCoord2f(texCoords[bIdx].u, texCoords[bIdx].v);
+        glVertex3f(b.x, b.y, b.z);
+        glTexCoord2f(texCoords[cIdx].u, texCoords[cIdx].v);
+        glVertex3f(c.x, c.y, c.z);
+      }
+      // render only points, no textures
+      else
+      {
+        glVertex3f(a.x, a.y, a.z);
+        glVertex3f(b.x, b.y, b.z);
+        glVertex3f(c.x, c.y, c.z);
+      }
     }
     glEnd();
+
+    // also render any control points
+    for(unsigned int i = 0; i < points.size(); i++){ if(points[i].fixed) { points[i].Render(); } }
   }
 }

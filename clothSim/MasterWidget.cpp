@@ -14,12 +14,12 @@
 #include "MasterWidget.h"
 #include "RenderWidget.h"
 
-MasterWidget::MasterWidget(char *filename, QWidget *parent)
+MasterWidget::MasterWidget(char *filename, char *texFilename, QWidget *parent)
 {
     std::cout << "Master Widget Init" << '\n';
 
     // Setup the Render Widget, passing the filename
-    renderWidget = new RenderWidget(filename, this);
+    renderWidget = new RenderWidget(filename, texFilename, this);
     renderWidget->setParent(this);
 
     // Timer for running animation
@@ -83,6 +83,7 @@ MasterWidget::MasterWidget(char *filename, QWidget *parent)
     settingsLayout->addWidget(fixedCornersCheck);
     settingsLayout->addWidget(windCheck);
     settingsLayout->addWidget(wireframeCheck);
+    settingsLayout->addWidget(texturesCheck);
     settingsLayout->addWidget(sphereSpinSpeedLabel);
     settingsLayout->addWidget(sphereSpinBox);
     settingsLayout->addWidget(sphereFrictionLabel);

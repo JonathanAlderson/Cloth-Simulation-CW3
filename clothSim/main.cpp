@@ -28,8 +28,11 @@ int main(int argc, char **argv)
 	char empty = '\0';
 	if(argc < 2){ filename = &empty; }
 
+	char *texFilename = argv[2];
+	if(argc < 3){ texFilename = &empty; }
+
 	//	create a window, passing the file name
-	MasterWidget aWindow(filename, NULL);
+	MasterWidget aWindow(filename, texFilename, NULL);
 
 	// 	set the initial size
 	aWindow.resize(SCREENX, SCREENY);

@@ -23,7 +23,7 @@
 #include "RenderWidget.h"
 
 // constructor
-RenderWidget::RenderWidget(char *filename, MasterWidget *parent)
+RenderWidget::RenderWidget(char *filename, char *texFilename, MasterWidget *parent)
 	: QGLWidget(parent)
 	{ // constructor
 		this->parentWidget = parent;
@@ -41,6 +41,10 @@ RenderWidget::RenderWidget(char *filename, MasterWidget *parent)
 
 		// will change when scolling
 		//size = bvh->boundingBoxSize;
+
+		// setup the texture
+		std::ifstream textureStream(texFilename);
+		texture.ReadPPM(textureStream);
 
 		// zoom amout
 		zoom = 1.0;
@@ -87,23 +91,61 @@ RenderWidget::~RenderWidget()
 
 // called when OpenGL context is set up
 void RenderWidget::initializeGL()
-	{ // RenderWidget::initializeGL()
+{ // RenderWidget::initializeGL()
 	// enable Z-buffering
 	glEnable(GL_DEPTH_TEST);
 
 	// set lighting parameters
-	glShadeModel(GL_FLAT);
+	glShadeModel(GL_SMOOTH);
 	glEnable(GL_LIGHT0);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_COLOR_MATERIAL);
-
+  glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE);
+	GLfloat lightPos0[] = {-2.f, 2.f, -2.f};
+	glLightfv(GL_LIGHT0, GL_POSITION, lightPos0);
 	glColor3f(1., 1., 1.);
+
+	// set the texture parameters
+	glEnable(GL_TEXTURE_2D);
 
 	// background is a nice blue
 	glClearColor(189. / 255., 215. / 255., 217. / 255., 1.0);
 
-	std::cout << "Init Gl" << '\n';
-	} // RenderWidget::initializeGL()
+	// setup the texutre so it can be sampled from
+	TransferTexture();
+
+} // RenderWidget::initializeGL()
+
+// routine to transfer assets to GPU
+// Hamish made this method 
+void RenderWidget::TransferTexture()
+{ // TransferAssetsToGPU()
+    // when this is called, it transfers assets to the GPU.
+    // for now, it will only be to transfer the texture
+    // this may not be efficient, but it supports arbitrary sizes best
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    // create a texture ID (essentially a pointer)
+    glGenTextures(1, &textureID);
+    // now bind to it - i.e. all following code addresses this one
+    glBindTexture(GL_TEXTURE_2D, textureID);
+    // set these parameters to avoid dealing with mipmaps
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    // now transfer the image
+    glTexImage2D(
+        GL_TEXTURE_2D,      // it's a 2D texture
+        0,                  // mipmap level of 0 (ie the largest one)
+        GL_RGBA,            // we want the data stored as RGBA on GPU
+        texture.width,      // width of the image
+        texture.height,     // height of the image
+        0,                  // width of border (in texels)
+        GL_RGBA,            // format the data is stored in on CPU
+        GL_UNSIGNED_BYTE,   // data type
+        texture.block       // and a pointer to the data
+        );
+		glBindTexture(GL_TEXTURE_2D, textureID);
+} // TransferAssetsToGPU()
+
 
 // called every time the widget is resized
 void RenderWidget::resizeGL(int w, int h)

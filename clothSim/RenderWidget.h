@@ -18,10 +18,12 @@
 #include <QMouseEvent>
 #include <QDateTime>
 #include <QFileDialog>
+#include <fstream>
 #include "MousePick.h"
 #include "MasterWidget.h"
 #include "Simulation.h"
 #include "camera.h"
+#include "RGBAImage.h"
 
 class RenderWidget : public QGLWidget
 	{ // class RenderWidget
@@ -88,14 +90,21 @@ class RenderWidget : public QGLWidget
 	float mouseLastX;
 	float mouseLastY;
 
+	// texture stuff
+	GLuint textureID;
+	RGBAImage texture;
+
 	// Action
-	RenderWidget(char *filename, MasterWidget *parent);
+	RenderWidget(char *filename, char *texFilename, MasterWidget *parent);
 
 	// destructor
 	~RenderWidget();
 
 	// allowing the camera to zoom in
 	void updatePerspective();
+
+	// loads a texutre
+	void TransferTexture();
 
 	protected:
 	// called when OpenGL context is set up

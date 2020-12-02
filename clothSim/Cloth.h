@@ -38,6 +38,18 @@ using namespace std;
 #include <GL/glu.h>
 #endif
 
+// tiny struct for texture coordinates
+struct Tex
+{
+  float u;
+  float v;
+
+  Tex(float uIn, float vIn)
+  {
+    u = uIn;
+    v = vIn;
+  }
+};
 
 class Cloth
 {
@@ -53,7 +65,8 @@ class Cloth
   public:
     vector<PointMass> points;          // pointmasses
     vector<Spring> springs;            // connecting springs
-    vector<unsigned int> vertRef;     // for rendering cloth
+    vector<unsigned int> vertRef;      // for rendering cloth
+    vector<Tex> texCoords;             // for rendering cloth
 
     // changes the rendering mode from cloth to rods and srpings
     bool wireframeRender;

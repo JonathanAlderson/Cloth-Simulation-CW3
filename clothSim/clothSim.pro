@@ -31,6 +31,8 @@ HEADERS += camera.h \
            RenderWidget.h \
            Simulation.h \
            Spring.h \
+           RGBAImage.h \
+           RGBAValue.h \
            Wind.h
 SOURCES += Cartesian3.cpp \
            Cloth.cpp \
@@ -42,4 +44,6 @@ SOURCES += Cartesian3.cpp \
            RenderWidget.cpp \
            Simulation.cpp \
            Spring.cpp \
+           RGBAImage.cpp \
+           RGBAValue.cpp \
            Wind.cpp

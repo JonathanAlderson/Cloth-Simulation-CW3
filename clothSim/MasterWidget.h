@@ -41,7 +41,7 @@ class MasterWidget : public QWidget
     Q_OBJECT
 
 public:
-    MasterWidget(char *filename, QWidget *parent);
+    MasterWidget(char *filename, char *texFilename, QWidget *parent);
 
     void keyPressEvent(QKeyEvent* event); // so we can escape to quit
     void keyReleaseEvent(QKeyEvent* event); // so we can control our camera nicely
