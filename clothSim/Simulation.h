@@ -23,6 +23,7 @@ using namespace std;
 #include <iomanip>
 #include "Cartesian3.h"
 #include "camera.h"
+#include "PointMass.h"
 #include "Cloth.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -95,8 +96,6 @@ public:
   // values updated from sliders
   float sphereFriction;
   float sphereSpin;
-  float windSpeed;
-  float gravity;
 
 public:
 

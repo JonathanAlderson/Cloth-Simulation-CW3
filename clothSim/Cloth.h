@@ -68,9 +68,16 @@ class Cloth
     vector<unsigned int> vertRef;      // for rendering cloth
     vector<Tex> texCoords;             // for rendering cloth
 
+    // for interacting with the cloth
+    Cartesian3 mouseForce;
+    int mouseTimeout;
+    int mouseMaxTimeout;
+
     // changes the rendering mode from cloth to rods and srpings
     bool wireframeRender;
     bool useTextures;
+    unsigned int activePoint;
+    unsigned int lastActivePoint;
 
     // perform one step of physics calculations
     void Update(float dT);
@@ -78,11 +85,12 @@ class Cloth
     // Show the current state of the cloth
     void Render();
 
+    void UpdateGravity(float gravity);
+
     // gives a force like you are dragging part of the cloth
     void ApplyForce(Cartesian3 forceIn);
 
-    // which point we are dragging
-    unsigned int activePoint;
+
 };
 
 #endif //_CLOTH_H_

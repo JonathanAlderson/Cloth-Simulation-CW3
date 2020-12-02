@@ -415,11 +415,11 @@ void MasterWidget::sphereSpinUpdate(int i)
 // update the wind speed
 void MasterWidget::windSpeedUpdate(int i)
 {
-  renderWidget->sim->windSpeed = (float)i;
+  renderWidget->sim->wind->speed = (float)i;
 }
 
 // update gravity of the simulation
 void MasterWidget::gravityUpdate(int i)
 {
-  renderWidget->sim->gravity = (float)i;
+  renderWidget->sim->cloth->UpdateGravity((float)i);
 }

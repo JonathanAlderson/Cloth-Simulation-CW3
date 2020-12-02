@@ -39,8 +39,10 @@ Simulation::Simulation()
 
   sphereFriction = 1.;
   sphereSpin     = 1.;
-  windSpeed      = 1.;
-  gravity        = 10.; // close enough to 9.81
+
+  // initialise wind
+  wind = new Wind();
+  wind->speed = 1;
 
   Init();
 }
@@ -57,11 +59,13 @@ Simulation::Simulation(const char *simFileName)
 
   sphereFriction = 1.;
   sphereSpin     = 1.;
-  windSpeed      = 1.;
-  gravity        = 10.; // close enough to 9.81
 
   // init cloth with obj file
   cloth = new Cloth(simFileName);
+
+  // initialise wind
+  wind = new Wind();
+  wind->speed = 1;
 
   Init();
 }
@@ -120,11 +124,25 @@ void Simulation::SaveFile(std::string fileName)
 // and find out what the global positions are
 void Simulation::Update(float dT)
 {
+  std::cout << "\n\n\n-------------------------" << std::endl;
+
+  // call the cloths update function
+  cloth->Update(dT);
+
   // Calcualte all the new positions and velocities
   // of the items in the scene
   for(unsigned int i = 0; i < cloth->springs.size(); i++)
   {
      cloth->springs[i].Update(dT);
+  }
+
+  // apply windy forces on all the particles if they want it
+  if(useWind)
+  {
+    for(unsigned int i = 0; i < cloth->points.size(); i++)
+    {
+      cloth->points[i].eForces[WIND] = wind->Force(cloth->points[i].pos);
+    }
   }
 
   // for each pointMass, find the current forces acting on it
@@ -134,10 +152,10 @@ void Simulation::Update(float dT)
    }
 
   // If we are in Euler Mode
-  EulerUpdate(dT);
+  //EulerUpdate(dT);
 
   // If we are in fancy Verlet mode
-  //VerletUpdate();
+  VerletUpdate(dT);
 
   // Now calcualte the forces exerted by all the
   // springs in the system
@@ -152,7 +170,6 @@ void Simulation::EulerUpdate(float dT)
   float      m;     // mass of the object
 
   // for every pointMass in the cloth
-
   for(unsigned int i = 0; i < cloth->points.size(); i ++)
   {
     // only move if the point is not fixed
@@ -166,6 +183,44 @@ void Simulation::EulerUpdate(float dT)
 
       // update position
       cloth->points[i].pos = rt1 + vt1 * dT;
+
+      // update acceleration
+      cloth->points[i].acc = fNet / m;
+
+      // update velocity
+      cloth->points[i].vel = vt1 + (fNet / m) * dT;
+    }
+  }
+}
+
+void Simulation::VerletUpdate(float dT)
+{
+  Cartesian3 rt1;    // position 1
+  Cartesian3 rt0;    // position before
+  Cartesian3 at1;    // acceleration 1
+  Cartesian3 vt1;    // velocity 1
+  Cartesian3 vtHalf; //velocity half step in front
+  Cartesian3 fNet;   // net forces
+  float      m;      // mass of the object
+
+  // for every pointMass in the cloth
+  for(unsigned int i = 0; i < cloth->points.size(); i ++)
+  {
+    // only move if the point is not fixed
+    if(cloth->points[i].fixed == false)
+    {
+      rt1  = cloth->points[i].pos;
+      rt0  = cloth->points[i].prevPos;
+      at1  = cloth->points[i].acc;
+      vt1  = cloth->points[i].vel;
+      fNet = cloth->points[i].cForce;
+      m    = cloth->points[i].mass;
+
+      // update position
+      cloth->points[i].pos = (rt1 * 2.) - rt0 + (fNet / m) * (dT * dT);
+
+      // find half velocity step
+      vtHalf = vt1 + (fNet / m) * dT;
 
       // update acceleration
       cloth->points[i].acc = fNet / m;

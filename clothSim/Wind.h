@@ -32,21 +32,25 @@ class Wind
 public:
   ~Wind(); // destructor
 
-   Wind(Cartesian3 origin, Cartesian3 direction, float speed); // constructor
+   Wind(); // constructor
 
    // reset
    void Reset();
 
-   Cartesian3 origin;
-   Cartesian3 direction;
+   // internal clock
+   float cTime;
+
+   // how windy the wind is
    float speed;
 
    // shows a big arrow for the wind direction
    void Render();
 
+   void Update(float dT);
+
    // calculates how much force the wind gives to a
    // point in 3D space
-   Cartesian3 Force(Cartesian3 target);
+   Cartesian3 Force(Cartesian3 pos);
 };
 
 #endif // _WIND_H_

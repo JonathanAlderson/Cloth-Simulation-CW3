@@ -35,8 +35,13 @@ Cloth::Cloth(const char *filename)
 
   // constants
   float ballMasses = 1.;
-  float springConstant = 10.;
+  float springConstant = 100.;
   float dampingConstant = 10.;
+
+  // for editing with the mouse
+  mouseMaxTimeout = 60;
+  mouseTimeout = 0;
+  lastActivePoint = -1;
 
   // reserve the correct sized vectors to avoid horrible memory problems
   points.reserve(curMesh.Vertices.size());
@@ -129,8 +134,8 @@ Cloth::Cloth(const char *filename)
         springs.push_back(Spring(&points[tempPos.x], &points[tempPos.y], springConstant, dampingConstant));
 
         // also tell the PointMasses which springs they are attached to
-        points[a].springs.push_back(&springs.back());
-        points[b].springs.push_back(&springs.back());
+        points[tempPos.x].springs.push_back(&springs.back());
+        points[tempPos.y].springs.push_back(&springs.back());
       }
     }
   }
@@ -144,7 +149,7 @@ Cloth::Cloth(const char *filename)
   // calculate all the colours of the points
   for(unsigned int i = 0; i < points.size(); i++)
   {
-    points[i].eForces.push_back(Cartesian3(0., -1.81, 0.));
+    points[i].eForces[GRAVITY] =  Cartesian3(0., -9.81, 0.);
     points[i].CalculateColour();
    }
 }
@@ -158,19 +163,44 @@ void Cloth::Reset()
 // update everything once
 void Cloth::Update(float dT)
 {
-  // update all of the forces in the springs depending
-  // on the balls positions
+  // apply a force to the cloth if the user has dragged it recently
+  std::cout << "Upate" << '\n';
+  std::cout << "mouseTimeout: " << mouseTimeout << std::endl;
+  if(mouseTimeout > 0)
+  {
+    std::cout << "Yewsa" << '\n';
+    mouseTimeout --;
+    points[lastActivePoint].eForces[MOUSE] = mouseForce;
+  }
+}
+
+// if ever we need a new value of gravity setting
+void Cloth::UpdateGravity(float gravIn)
+{
+  gravIn = -gravIn;
+  // we know if you ask for 10 you really want 9.81
+  if(gravIn == -10.){ gravIn = -9.81; }
+
+  Cartesian3 newGravity = Cartesian3(0., gravIn, 0.);
+  for(unsigned int i = 0; i < points.size(); i++)
+  {
+     points[i].eForces[GRAVITY] = newGravity;
+   }
 }
 
 // gives an instantaneous force to the point we are dragging at the moment
 void Cloth::ApplyForce(Cartesian3 movement)
 {
-  movement = movement * 1000.;
-  std::cout << "Applying force to " << activePoint << " of " << movement << '\n';
+  movement = movement * 10000.;
+  mouseForce = movement;
   // add the force and update the colour
-  points[activePoint].eForces.push_back(movement);
+  points[activePoint].eForces[MOUSE] = mouseForce;
   points[activePoint].CalculateTotalForce();
   points[activePoint].CalculateColour();
+
+  // make this effect happen for a few frames
+  mouseTimeout = mouseMaxTimeout;
+  lastActivePoint = activePoint;
 }
 
 

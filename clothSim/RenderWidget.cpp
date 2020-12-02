@@ -76,7 +76,7 @@ RenderWidget::RenderWidget(char *filename, char *texFilename, MasterWidget *pare
 		mousePicker = new MousePick(&(sim->globalPositions), 1.0);
 
 		// Construct Camera with default values
-		camera = Camera();
+		camera = Camera(glm::vec3(0.f, 0.f, 5.f));
 		movingCamera = false;
 
 		setMouseTracking(true);
@@ -184,8 +184,6 @@ void RenderWidget::updatePerspective()
 // called every time the widget needs painting
 void RenderWidget::paintGL()
 	{ // RenderWidget::paintGL()
-	std::cout << "Update" << '\n';
-
 	// clear the buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

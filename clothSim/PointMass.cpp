@@ -31,6 +31,11 @@ PointMass::PointMass(Cartesian3 position, float massIn)
   vel = Cartesian3(0., 0, 0);
   acc = Cartesian3(0., 0, 0);
 
+  // are external forces are always present
+  eForces.push_back(Cartesian3(0., 0., 0.));   // wind
+  eForces.push_back(Cartesian3(0., 0., 0.));   // mouse
+  eForces.push_back(Cartesian3(0., 0., 0.));   // gravity
+
 }
 
 PointMass::~PointMass()
@@ -65,10 +70,14 @@ void PointMass::CalculateTotalForce()
   for(unsigned int i = 0; i < springs.size(); i++)
   {
     // pmA --> left hand side
-    if(this == springs[i]->pmA)  cForce = cForce - springs[i]->force;
+    if(this == springs[i]->pmA){ cForce = cForce - springs[i]->force; }
     // pmB --> Right Hand Size
-    else                         cForce = cForce + springs[i]->force;
+    else                        { cForce = cForce + springs[i]->force; }
    }
+
+   // once we have calculated total force
+   // we reset anyforces that are because of the mouse
+   eForces[MOUSE] = Cartesian3(0., 0., 0.);
 }
 
 
@@ -85,7 +94,7 @@ void PointMass::CalculateColour()
 
   // point masses get bluer as more force is applied to them
   col = Cartesian3(ratio, 1., ratio);
-  
+
 
   if(fixed){ col = Cartesian3(0., .7, .7); }
 }

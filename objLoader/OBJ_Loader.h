@@ -655,6 +655,12 @@ namespace objl
 						}
 					}
 
+					// Load comments
+					if(algorithm::firstToken(curline) == "#")
+					{
+						std::cout << "Haha Yes My Dude" << '\n';
+					}
+
 
 					pathtomat += algorithm::tail(curline);
 

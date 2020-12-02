@@ -38,6 +38,14 @@ using namespace std;
 // forward decleration of Spring
 class Spring;
 
+// ENum for eForces
+enum FORCES
+{
+  WIND,
+  MOUSE,
+  GRAVITY,
+};
+
 class PointMass
 {
 public:
@@ -67,6 +75,9 @@ public:
 
   // current position
   Cartesian3 pos;
+
+  // last position
+  Cartesian3 prevPos;
 
   // current colour
   Cartesian3 col;

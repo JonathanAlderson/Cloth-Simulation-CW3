@@ -13,20 +13,26 @@
 
 #include "Wind.h"
 
-Wind::Wind(Cartesian3 originIn, Cartesian3 directionIn, float speedIn)
+Wind::Wind()
 {
-  // set
-  origin    = originIn;
-  direction = directionIn;
-  speed     = speedIn;
+  std::cout << "Wind Init" << '\n';
+  cTime = 0.;
 }
 
 void Wind::Render()
 {  // todo
 }
 
-Cartesian3 Wind::Force(Cartesian3 target)
+void Wind::Update(float dT)
 {
-  // basic for now
-  return (direction * speed);
+  cTime += dT;
+}
+
+Cartesian3 Wind::Force(Cartesian3 pos)
+{
+  Cartesian3 force = Cartesian3(sin(pos.x * pos.y * cTime), cos(pos.z * cTime), cos(5. * pos.x * pos.y * pos.z));
+
+  force = force * speed;
+
+  return (force);
 }

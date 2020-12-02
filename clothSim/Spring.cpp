@@ -65,6 +65,7 @@ void Spring::Update(float dt)
   // without dampening
   force = unitVec * (-springConst * (lc - lr));
 
+
   // with dampening
   Cartesian3 vels = (p2Vel - p1Vel);
   float dot = vels.x * unitVec.x + vels.y * unitVec.y + vels.z * unitVec.z;
