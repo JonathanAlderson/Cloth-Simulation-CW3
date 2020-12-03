@@ -44,6 +44,7 @@ void Plane::Render()
 
   // dark blue plane
   glColor3f(0., 0.8, 0.8);
+  glNormal3f(0., 1., 0.); // static normal
 
   // lower triangle
   glVertex3f(center.x - width, center.y, center.z - height);

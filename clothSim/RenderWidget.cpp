@@ -33,6 +33,10 @@ RenderWidget::RenderWidget(char *filename, char *texFilename, MasterWidget *pare
 		else {sim = new Simulation(filename); }
 		sim->FindGlobalPosition(&camera);
 
+		// save the filename for reseting
+		std::string stringFile(filename);
+		curFileName = stringFile;
+
 		// set default values
 		whichButton = -1;
 
@@ -309,6 +313,7 @@ void RenderWidget::mouseMoveEvent(QMouseEvent *event)
 		//mouseMove = 1000.0;
 
 		sim->cloth->ApplyForce(mouseMove);
+		updateGL();
 
 		// if(doneOnce != true)
 		// {
@@ -375,15 +380,31 @@ void RenderWidget::mouseReleaseEvent(QMouseEvent *event)
 		return QSize(600, 600);
 	}
 
+// simply reloads the scene
+void RenderWidget::reset()
+{
+	sim = new Simulation(curFileName.c_str());
+	sim->FindGlobalPosition(&camera);
+	// initialise the mouse clicker
+	mousePicker = new MousePick(&(sim->globalPositions), 1.0);
+
+	// reset the camera here
+	updateGL();
+	paintGL();
+}
 
 
-void RenderWidget::loadButtonPressed()
+// Loads a new obj the user wants to see
+void RenderWidget::loadOBJButtonPressed()
 {
 	newFileName = QFileDialog::getOpenFileName(this,
-    tr("Open BVH File"), "../animFiles", tr("Anim Files (*.bvh)"));
+    tr("Open OBJ File"), "../objFiles", tr("OBJ Files (*.obj)"));
+
+	// Debug
   std::cout << "Reading: ";
 	std::cout << newFileName.toStdString() << '\n';
 
+	curFileName = newFileName.toStdString();
 	if(newFileName.toStdString().size() > 0)
 	{
 		// reset default values
@@ -400,6 +421,26 @@ void RenderWidget::loadButtonPressed()
 		updateGL();
 		paintGL();
 	}
+}
+
+// Loads a new tex the user wants to see
+void RenderWidget::loadTexButtonPressed()
+{
+	newTexName = QFileDialog::getOpenFileName(this,
+    tr("Open Texture File"), "../textures", tr("Textures (*.ppm)"));
+
+	// Debug
+  std::cout << "Reading: ";
+	std::cout << newTexName.toStdString() << '\n';
+
+	std::ifstream textureStream(newTexName.toStdString().c_str());
+	texture.ReadPPM(textureStream);
+	TransferTexture();
+
+	// reset the camera here
+	updateGL();
+	paintGL();
+
 }
 
 void RenderWidget::saveButtonPressed()

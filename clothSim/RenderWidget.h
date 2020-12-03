@@ -19,6 +19,8 @@
 #include <QDateTime>
 #include <QFileDialog>
 #include <fstream>
+#include <string>
+#include <iostream>
 #include "MousePick.h"
 #include "MasterWidget.h"
 #include "Simulation.h"
@@ -48,7 +50,10 @@ class RenderWidget : public QGLWidget
 	// which button was last pressed
 	int whichButton;
 
+	// for reading/writing/reseting a file
 	QString newFileName;
+	string  curFileName;
+	QString newTexName;
 
 	float size;
 
@@ -106,7 +111,6 @@ class RenderWidget : public QGLWidget
 	// loads a texutre
 	void TransferTexture();
 
-	protected:
 	// called when OpenGL context is set up
 	void initializeGL();
 	// called every time the widget is resized
@@ -125,8 +129,10 @@ class RenderWidget : public QGLWidget
 
 	// gui controls
 	public slots:
-		void loadButtonPressed();
+		void loadOBJButtonPressed();
+		void loadTexButtonPressed();
 		void saveButtonPressed();
+		void reset();
 		void timerUpdate();
 
 	}; // class RenderWidget

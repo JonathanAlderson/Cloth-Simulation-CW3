@@ -30,7 +30,9 @@ Cloth::Cloth(const char *filename)
   bool loadout = Loader.LoadFile(filename);
   objl::Mesh curMesh = Loader.LoadedMeshes[0];
 
+
   // rendering mode
+  useTextures = false;
   wireframeRender = false;
 
   // constants
@@ -90,11 +92,9 @@ Cloth::Cloth(const char *filename)
   }
 
   // set all the vertices to be fixed that we read from the file
-  std::cout << "Here is fixed" << '\n';
   std::cout << curMesh.Fixed.size() << '\n';
   for (unsigned int j = 0; j < curMesh.Fixed.size(); j++)
   {
-    std::cout << "Fixed Dound" << '\n';
     points[curMesh.Fixed[j]].fixed = true;
   }
 
@@ -173,11 +173,8 @@ void Cloth::Reset()
 void Cloth::Update(float dT)
 {
   // apply a force to the cloth if the user has dragged it recently
-  std::cout << "Upate" << '\n';
-  std::cout << "mouseTimeout: " << mouseTimeout << std::endl;
   if(mouseTimeout > 0)
   {
-    std::cout << "Yewsa" << '\n';
     mouseTimeout --;
     points[lastActivePoint].eForces[MOUSE] = mouseForce;
   }
@@ -212,7 +209,7 @@ void Cloth::ApplyForce(Cartesian3 movement)
   lastActivePoint = activePoint;
 }
 
-
+// Draw the cloth on the screen with whatever mode it wants
 void Cloth::Render()
 {
   if(wireframeRender)

@@ -34,12 +34,14 @@ MasterWidget::MasterWidget(char *filename, char *texFilename, QWidget *parent)
 
     // Save/Load
     QGroupBox   *saveLoadGroup     = new QGroupBox(tr("Save/Load"));
-    QPushButton *loadButton        = new QPushButton("Load", this);
+    QPushButton *loadOBJButton     = new QPushButton("Load OBJ", this);
+    QPushButton *loadTexButton     = new QPushButton("Load Texture", this);
     QPushButton *saveButton        = new QPushButton("Save", this);
     QVBoxLayout *saveLoadLayout    = new QVBoxLayout;
 
 
-    saveLoadLayout->addWidget(loadButton);
+    saveLoadLayout->addWidget(loadOBJButton);
+    saveLoadLayout->addWidget(loadTexButton);
     saveLoadLayout->addWidget(saveButton);
     saveLoadGroup ->setLayout(saveLoadLayout);
 
@@ -145,7 +147,8 @@ MasterWidget::MasterWidget(char *filename, char *texFilename, QWidget *parent)
     QObject::connect(stopShortcut,        SIGNAL(activated()), this, SLOT(stop()));
 
     // Connecting
-    connect(loadButton,            SIGNAL(pressed()),      renderWidget, SLOT(loadButtonPressed()));
+    connect(loadOBJButton,         SIGNAL(pressed()),      renderWidget, SLOT(loadOBJButtonPressed()));
+    connect(loadTexButton,         SIGNAL(pressed()),      renderWidget, SLOT(loadTexButtonPressed()));
     connect(saveButton,            SIGNAL(pressed()),      renderWidget, SLOT(saveButtonPressed()));
     connect(sphereSpinBox,         SIGNAL(valueChanged(int)), this,      SLOT(sphereSpinUpdate(int)));
     connect(sphereFrictionSpinBox, SIGNAL(valueChanged(int)), this,      SLOT(sphereFrictionUpdate(int)));
@@ -308,14 +311,22 @@ void MasterWidget::playPause()
   else{ renderWidget->paused = true; return; }
 }
 
-// Stops playback of the current animation
+// resets the scene to how it was at the start
 void MasterWidget::stop()
 {
- renderWidget->paused = true;
- renderWidget->cFrame = 0.;
- renderWidget->cTime = 0;
+  // remember these as once we reset they will be forgotten
+  bool oldTex  = renderWidget->sim->cloth->useTextures;
+  bool oldWire = renderWidget->sim->cloth->wireframeRender;
+  renderWidget->reset();
 
- renderWidget->updateGL();
+  // reset to what they were
+  renderWidget->sim->cloth->useTextures = oldTex;
+  renderWidget->sim->cloth->wireframeRender = oldWire;
+
+  // update screen
+  renderWidget->sim->Render(renderWidget->sim->cFrame, &(renderWidget->camera));
+  renderWidget->updateGL();
+
 }
 
 // changes the rendering mode for the cloth
@@ -324,7 +335,9 @@ void MasterWidget::toggleWireframe()
   if(renderWidget->sim->cloth->wireframeRender == 0)
   {
     renderWidget->sim->cloth->wireframeRender = 1;
+    renderWidget->sim->cloth->useTextures = 0;
     wireframeCheck->setChecked(true);
+    texturesCheck->setChecked(false);
   }
   else
   {
@@ -339,7 +352,9 @@ void MasterWidget::toggleTextures()
   if(renderWidget->sim->cloth->useTextures == 0)
   {
     renderWidget->sim->cloth->useTextures = 1;
+    renderWidget->sim->cloth->wireframeRender = 0;
     texturesCheck->setChecked(true);
+    wireframeCheck->setChecked(false);
   }
   else
   {

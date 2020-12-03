@@ -54,7 +54,8 @@ private:
     QSlider *createSlider();
 
     RenderWidget *renderWidget;
-    QPushButton  *loadButton;
+    QPushButton  *loadOBJButton;
+    QPushButton  *loadTexButton;
     QTimer       *timer;
     QCheckBox    *sphereCheck;
     QCheckBox    *windCheck;
