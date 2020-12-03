@@ -199,10 +199,11 @@ namespace objl
 
 		}
 		// Variable Set Constructor
-		Mesh(std::vector<Vertex>& _Vertices, std::vector<unsigned int>& _Indices)
+		Mesh(std::vector<Vertex>& _Vertices, std::vector<unsigned int>& _Indices, std::vector<unsigned int>& _Fixed)
 		{
 			Vertices = _Vertices;
 			Indices = _Indices;
+			Fixed = _Fixed;
 		}
 		// Mesh Name
 		std::string MeshName;
@@ -210,6 +211,8 @@ namespace objl
 		std::vector<Vertex> Vertices;
 		// Index List
 		std::vector<unsigned int> Indices;
+		// Fixed Points List
+		std::vector<unsigned int> Fixed;
 
 		// Material
 		Material MeshMaterial;
@@ -450,8 +453,10 @@ namespace objl
 
 			std::vector<Vertex> Vertices;
 			std::vector<unsigned int> Indices;
+			std::vector<unsigned int> Fixed;
 
 			std::vector<std::string> MeshMatNames;
+
 
 			bool listening = false;
 			std::string meshname;
@@ -505,7 +510,7 @@ namespace objl
 						if (!Indices.empty() && !Vertices.empty())
 						{
 							// Create Mesh
-							tempMesh = Mesh(Vertices, Indices);
+							tempMesh = Mesh(Vertices, Indices, Fixed);
 							tempMesh.MeshName = meshname;
 
 							// Insert Mesh
@@ -514,7 +519,9 @@ namespace objl
 							// Cleanup
 							Vertices.clear();
 							Indices.clear();
+							Fixed.clear();
 							meshname.clear();
+
 
 							meshname = algorithm::tail(curline);
 						}
@@ -612,7 +619,7 @@ namespace objl
 					if (!Indices.empty() && !Vertices.empty())
 					{
 						// Create Mesh
-						tempMesh = Mesh(Vertices, Indices);
+						tempMesh = Mesh(Vertices, Indices, Fixed);
 						tempMesh.MeshName = meshname;
 						int i = 2;
 						while(1) {
@@ -655,12 +662,6 @@ namespace objl
 						}
 					}
 
-					// Load comments
-					if(algorithm::firstToken(curline) == "#")
-					{
-						std::cout << "Haha Yes My Dude" << '\n';
-					}
-
 
 					pathtomat += algorithm::tail(curline);
 
@@ -670,6 +671,14 @@ namespace objl
 
 					// Load Materials
 					LoadMaterials(pathtomat);
+				}
+
+				// Check for fixed vertices
+				if(algorithm::firstToken(curline) == "#f")
+				{
+					std::cout << "Haha Yes My Dude" << '\n';
+					std::cout << Positions.size() << '\n';
+					Fixed.push_back(Positions.size());
 				}
 			}
 
@@ -682,7 +691,7 @@ namespace objl
 			if (!Indices.empty() && !Vertices.empty())
 			{
 				// Create Mesh
-				tempMesh = Mesh(Vertices, Indices);
+				tempMesh = Mesh(Vertices, Indices, Fixed);
 				tempMesh.MeshName = meshname;
 
 				// Insert Mesh

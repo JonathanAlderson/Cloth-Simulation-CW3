@@ -89,6 +89,15 @@ Cloth::Cloth(const char *filename)
     }
   }
 
+  // set all the vertices to be fixed that we read from the file
+  std::cout << "Here is fixed" << '\n';
+  std::cout << curMesh.Fixed.size() << '\n';
+  for (unsigned int j = 0; j < curMesh.Fixed.size(); j++)
+  {
+    std::cout << "Fixed Dound" << '\n';
+    points[curMesh.Fixed[j]].fixed = true;
+  }
+
   // find which unique vertices the edges are reffering to
   for (unsigned int j = 0; j < curMesh.Indices.size(); j+=3)
   {

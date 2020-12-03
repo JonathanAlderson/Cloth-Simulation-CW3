@@ -32,7 +32,7 @@ class Wind
 public:
   ~Wind(); // destructor
 
-   Wind(); // constructor
+   Wind(int numParticles); // constructor
 
    // reset
    void Reset();
@@ -42,6 +42,15 @@ public:
 
    // how windy the wind is
    float speed;
+
+   // has particles showing how the wind is traveling
+   bool show;
+
+   // tracks the position of all the wind particles
+   int numParticles;
+   float windAngle; 
+   int area;  // bounding box
+   vector<Cartesian3> particles;
 
    // shows a big arrow for the wind direction
    void Render();

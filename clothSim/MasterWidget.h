@@ -57,7 +57,6 @@ private:
     QPushButton  *loadButton;
     QTimer       *timer;
     QCheckBox    *sphereCheck;
-    QCheckBox    *fixedCornersCheck;
     QCheckBox    *windCheck;
     QCheckBox    *wireframeCheck;
     QCheckBox    *texturesCheck;
@@ -76,7 +75,6 @@ public slots:
   void toggleWireframe();
   void toggleTextures();
   void toggleWind();
-  void toggleFixedCorners();
   void sphereFrictionUpdate(int i);
   void sphereSpinUpdate(int i);
   void gravityUpdate(int i);

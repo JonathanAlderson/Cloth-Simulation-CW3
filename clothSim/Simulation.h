@@ -25,6 +25,7 @@ using namespace std;
 #include "camera.h"
 #include "PointMass.h"
 #include "Cloth.h"
+#include "Plane.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -72,6 +73,10 @@ public:
   Cloth     *cloth;
   PointMass *ball;
   Wind      *wind;
+  Plane     *ground;
+
+  // for the wind visualisation
+  int windParticles;
 
 
   // for mouse interaction with the cloth
@@ -89,9 +94,7 @@ public:
   std::string fileContents;
 
   // bools controlled by checkboxes
-  bool useWind;
   bool showSphere;
-  bool fixedCorners;
 
   // values updated from sliders
   float sphereFriction;

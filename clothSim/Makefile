@@ -62,6 +62,7 @@ SOURCES       = Cartesian3.cpp \
 		Spring.cpp \
 		RGBAImage.cpp \
 		RGBAValue.cpp \
+		Plane.cpp \
 		Wind.cpp moc_MasterWidget.cpp \
 		moc_RenderWidget.cpp
 OBJECTS       = Cartesian3.o \
@@ -76,6 +77,7 @@ OBJECTS       = Cartesian3.o \
 		Spring.o \
 		RGBAImage.o \
 		RGBAValue.o \
+		Plane.o \
 		Wind.o \
 		moc_MasterWidget.o \
 		moc_RenderWidget.o
@@ -165,6 +167,7 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		Spring.h \
 		RGBAImage.h \
 		RGBAValue.h \
+		Plane.h \
 		Wind.h Cartesian3.cpp \
 		Cloth.cpp \
 		GObject.cpp \
@@ -177,6 +180,7 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		Spring.cpp \
 		RGBAImage.cpp \
 		RGBAValue.cpp \
+		Plane.cpp \
 		Wind.cpp
 QMAKE_TARGET  = clothSim
 DESTDIR       = 
@@ -361,8 +365,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents camera.h Cartesian3.h Cloth.h GObject.h MasterWidget.h matrix.h MousePick.h PointMass.h RenderWidget.h Simulation.h Spring.h RGBAImage.h RGBAValue.h Wind.h $(DISTDIR)/
-	$(COPY_FILE) --parents Cartesian3.cpp Cloth.cpp GObject.cpp main.cpp MasterWidget.cpp MousePick.cpp PointMass.cpp RenderWidget.cpp Simulation.cpp Spring.cpp RGBAImage.cpp RGBAValue.cpp Wind.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents camera.h Cartesian3.h Cloth.h GObject.h MasterWidget.h matrix.h MousePick.h PointMass.h RenderWidget.h Simulation.h Spring.h RGBAImage.h RGBAValue.h Plane.h Wind.h $(DISTDIR)/
+	$(COPY_FILE) --parents Cartesian3.cpp Cloth.cpp GObject.cpp main.cpp MasterWidget.cpp MousePick.cpp PointMass.cpp RenderWidget.cpp Simulation.cpp Spring.cpp RGBAImage.cpp RGBAValue.cpp Plane.cpp Wind.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -407,10 +411,11 @@ moc_RenderWidget.cpp: MousePick.h \
 		camera.h \
 		MasterWidget.h \
 		Simulation.h \
-		Cloth.h \
 		PointMass.h \
+		Cloth.h \
 		Spring.h \
 		Wind.h \
+		Plane.h \
 		RGBAImage.h \
 		RGBAValue.h \
 		RenderWidget.h \
@@ -453,10 +458,11 @@ main.o: main.cpp RenderWidget.h \
 		camera.h \
 		MasterWidget.h \
 		Simulation.h \
-		Cloth.h \
 		PointMass.h \
+		Cloth.h \
 		Spring.h \
 		Wind.h \
+		Plane.h \
 		RGBAImage.h \
 		RGBAValue.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
@@ -467,10 +473,11 @@ MasterWidget.o: MasterWidget.cpp MasterWidget.h \
 		Cartesian3.h \
 		camera.h \
 		Simulation.h \
-		Cloth.h \
 		PointMass.h \
+		Cloth.h \
 		Spring.h \
 		Wind.h \
+		Plane.h \
 		RGBAImage.h \
 		RGBAValue.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o MasterWidget.o MasterWidget.cpp
@@ -492,10 +499,11 @@ RenderWidget.o: RenderWidget.cpp RenderWidget.h \
 		camera.h \
 		MasterWidget.h \
 		Simulation.h \
-		Cloth.h \
 		PointMass.h \
+		Cloth.h \
 		Spring.h \
 		Wind.h \
+		Plane.h \
 		RGBAImage.h \
 		RGBAValue.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o RenderWidget.o RenderWidget.cpp
@@ -503,10 +511,11 @@ RenderWidget.o: RenderWidget.cpp RenderWidget.h \
 Simulation.o: Simulation.cpp Simulation.h \
 		Cartesian3.h \
 		camera.h \
-		Cloth.h \
 		PointMass.h \
+		Cloth.h \
 		Spring.h \
-		Wind.h
+		Wind.h \
+		Plane.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Simulation.o Simulation.cpp
 
 Spring.o: Spring.cpp Spring.h \
@@ -521,6 +530,12 @@ RGBAImage.o: RGBAImage.cpp RGBAImage.h \
 
 RGBAValue.o: RGBAValue.cpp RGBAValue.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o RGBAValue.o RGBAValue.cpp
+
+Plane.o: Plane.cpp Plane.h \
+		Cartesian3.h \
+		PointMass.h \
+		camera.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Plane.o Plane.cpp
 
 Wind.o: Wind.cpp Wind.h \
 		Cartesian3.h \

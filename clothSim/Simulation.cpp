@@ -33,16 +33,18 @@ Simulation::Simulation()
   // reset
 	Clear();
 
-  useWind      = false;
+  windParticles = 500;
   showSphere   = false;
-  fixedCorners = false;
 
   sphereFriction = 1.;
   sphereSpin     = 1.;
 
   // initialise wind
-  wind = new Wind();
-  wind->speed = 1;
+  wind = new Wind(windParticles);
+  wind->speed = 0;
+
+  // initialise ground plane
+  ground = new Plane(Cartesian3(0., -10., 0.), 10., 10.);
 
   Init();
 }
@@ -53,9 +55,8 @@ Simulation::Simulation(const char *simFileName)
   // reset
 	Clear();
 
-  useWind      = false;
+  windParticles = 500;
   showSphere   = false;
-  fixedCorners = false;
 
   sphereFriction = 1.;
   sphereSpin     = 1.;
@@ -64,8 +65,11 @@ Simulation::Simulation(const char *simFileName)
   cloth = new Cloth(simFileName);
 
   // initialise wind
-  wind = new Wind();
-  wind->speed = 1;
+  wind = new Wind(windParticles);
+  wind->speed = 0;
+
+  // initialise ground plane
+  ground = new Plane(Cartesian3(0., -10., 0.), 10., 10.);
 
   Init();
 }
@@ -126,8 +130,17 @@ void Simulation::Update(float dT)
 {
   std::cout << "\n\n\n-------------------------" << std::endl;
 
+  // update the wind in our scene
+  wind->Update(dT);
+
   // call the cloths update function
   cloth->Update(dT);
+
+  // Check for gound plane intersections with our pointmasses
+  for(unsigned int i = 0; i < cloth->points.size(); i++)
+  {
+    ground->Collision(&(cloth->points[i]));
+  }
 
   // Calcualte all the new positions and velocities
   // of the items in the scene
@@ -137,7 +150,7 @@ void Simulation::Update(float dT)
   }
 
   // apply windy forces on all the particles if they want it
-  if(useWind)
+  if(wind->speed > 0)
   {
     for(unsigned int i = 0; i < cloth->points.size(); i++)
     {
@@ -152,10 +165,10 @@ void Simulation::Update(float dT)
    }
 
   // If we are in Euler Mode
-  //EulerUpdate(dT);
+  EulerUpdate(dT);
 
   // If we are in fancy Verlet mode
-  VerletUpdate(dT);
+  //VerletUpdate(dT);
 
   // Now calcualte the forces exerted by all the
   // springs in the system
@@ -236,6 +249,8 @@ void Simulation::Render(int frameNo, Camera *camera)
 {
   cloth->Render();
   // ball->Render();
-  // wind->Render();
+  wind->Render();
+
+  ground->Render();
 
 }

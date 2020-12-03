@@ -21,8 +21,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_MasterWidget_t {
-    QByteArrayData data[16];
-    char stringdata0[184];
+    QByteArrayData data[15];
+    char stringdata0[165];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -41,17 +41,16 @@ QT_MOC_LITERAL(6, 40, 12), // "toggleSphere"
 QT_MOC_LITERAL(7, 53, 15), // "toggleWireframe"
 QT_MOC_LITERAL(8, 69, 14), // "toggleTextures"
 QT_MOC_LITERAL(9, 84, 10), // "toggleWind"
-QT_MOC_LITERAL(10, 95, 18), // "toggleFixedCorners"
-QT_MOC_LITERAL(11, 114, 20), // "sphereFrictionUpdate"
-QT_MOC_LITERAL(12, 135, 1), // "i"
-QT_MOC_LITERAL(13, 137, 16), // "sphereSpinUpdate"
-QT_MOC_LITERAL(14, 154, 13), // "gravityUpdate"
-QT_MOC_LITERAL(15, 168, 15) // "windSpeedUpdate"
+QT_MOC_LITERAL(10, 95, 20), // "sphereFrictionUpdate"
+QT_MOC_LITERAL(11, 116, 1), // "i"
+QT_MOC_LITERAL(12, 118, 16), // "sphereSpinUpdate"
+QT_MOC_LITERAL(13, 135, 13), // "gravityUpdate"
+QT_MOC_LITERAL(14, 149, 15) // "windSpeedUpdate"
 
     },
     "MasterWidget\0pause\0\0play\0stop\0playPause\0"
     "toggleSphere\0toggleWireframe\0"
-    "toggleTextures\0toggleWind\0toggleFixedCorners\0"
+    "toggleTextures\0toggleWind\0"
     "sphereFrictionUpdate\0i\0sphereSpinUpdate\0"
     "gravityUpdate\0windSpeedUpdate"
 };
@@ -63,7 +62,7 @@ static const uint qt_meta_data_MasterWidget[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      13,   14, // methods
+      12,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -71,19 +70,18 @@ static const uint qt_meta_data_MasterWidget[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    0,   79,    2, 0x0a /* Public */,
-       3,    0,   80,    2, 0x0a /* Public */,
-       4,    0,   81,    2, 0x0a /* Public */,
-       5,    0,   82,    2, 0x0a /* Public */,
-       6,    0,   83,    2, 0x0a /* Public */,
-       7,    0,   84,    2, 0x0a /* Public */,
-       8,    0,   85,    2, 0x0a /* Public */,
-       9,    0,   86,    2, 0x0a /* Public */,
-      10,    0,   87,    2, 0x0a /* Public */,
-      11,    1,   88,    2, 0x0a /* Public */,
-      13,    1,   91,    2, 0x0a /* Public */,
-      14,    1,   94,    2, 0x0a /* Public */,
-      15,    1,   97,    2, 0x0a /* Public */,
+       1,    0,   74,    2, 0x0a /* Public */,
+       3,    0,   75,    2, 0x0a /* Public */,
+       4,    0,   76,    2, 0x0a /* Public */,
+       5,    0,   77,    2, 0x0a /* Public */,
+       6,    0,   78,    2, 0x0a /* Public */,
+       7,    0,   79,    2, 0x0a /* Public */,
+       8,    0,   80,    2, 0x0a /* Public */,
+       9,    0,   81,    2, 0x0a /* Public */,
+      10,    1,   82,    2, 0x0a /* Public */,
+      12,    1,   85,    2, 0x0a /* Public */,
+      13,    1,   88,    2, 0x0a /* Public */,
+      14,    1,   91,    2, 0x0a /* Public */,
 
  // slots: parameters
     QMetaType::Void,
@@ -94,11 +92,10 @@ static const uint qt_meta_data_MasterWidget[] = {
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void,
-    QMetaType::Void, QMetaType::Int,   12,
-    QMetaType::Void, QMetaType::Int,   12,
-    QMetaType::Void, QMetaType::Int,   12,
-    QMetaType::Void, QMetaType::Int,   12,
+    QMetaType::Void, QMetaType::Int,   11,
+    QMetaType::Void, QMetaType::Int,   11,
+    QMetaType::Void, QMetaType::Int,   11,
+    QMetaType::Void, QMetaType::Int,   11,
 
        0        // eod
 };
@@ -117,11 +114,10 @@ void MasterWidget::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id
         case 5: _t->toggleWireframe(); break;
         case 6: _t->toggleTextures(); break;
         case 7: _t->toggleWind(); break;
-        case 8: _t->toggleFixedCorners(); break;
-        case 9: _t->sphereFrictionUpdate((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 10: _t->sphereSpinUpdate((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 11: _t->gravityUpdate((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 12: _t->windSpeedUpdate((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 8: _t->sphereFrictionUpdate((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 9: _t->sphereSpinUpdate((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 10: _t->gravityUpdate((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 11: _t->windSpeedUpdate((*reinterpret_cast< int(*)>(_a[1]))); break;
         default: ;
         }
     }
@@ -152,13 +148,13 @@ int MasterWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 13)
+        if (_id < 12)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 13;
+        _id -= 12;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 13)
+        if (_id < 12)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 13;
+        _id -= 12;
     }
     return _id;
 }

@@ -10,6 +10,12 @@ z = 0
 # cloth scale
 scl = int(sys.argv[3])
 
+# rotate 90 degrees
+rotate = False
+if(len(sys.argv) == 5):
+    rotate = True
+    print("Rotate oh yeah")
+
 # find width and height
 width = (n - 1) * scl
 height = (m - 1) * scl
@@ -18,9 +24,14 @@ height = (m - 1) * scl
 startX = (-(n-1) / 2) * scl
 startY = -(m-1) * scl
 currPos = [startX, startY]
+savePos = [0, 0, 0]
 
 
-file = open("objFiles/cloth-" + str(n) + "x" + str(m) + ".obj", "w")
+if(rotate == True):
+    file = open("objFiles/clothR-" + str(n) + "x" + str(m) + ".obj", "w")
+else:
+    file = open("objFiles/cloth-" + str(n) + "x" + str(m) + ".obj", "w")
+
 
 # write vertices
 for i in range(0, m):
@@ -28,7 +39,13 @@ for i in range(0, m):
     currPos[0] = startX
     for j in range(0, n):
 
-        file.write("v " + str(currPos[0]) + " " + str(currPos[1]) + " 0\n")
+        # we can rotate the values 90 degrees if we need to
+        if(rotate == False):
+            savePos = [currPos[0], currPos[1], 0]
+        else:
+            savePos = [currPos[0], 0, -currPos[1]]
+
+        file.write("v " + str(savePos[0]) + " " + str(savePos[1]) + " " + str(savePos[2]) + "\n")
 
         #update X
         currPos[0] += scl

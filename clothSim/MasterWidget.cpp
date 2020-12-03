@@ -46,7 +46,6 @@ MasterWidget::MasterWidget(char *filename, char *texFilename, QWidget *parent)
     // Settings
     QGroupBox   *settingsGroup         = new QGroupBox(tr("Settings"));
                  sphereCheck           = new QCheckBox();
-                 fixedCornersCheck     = new QCheckBox();
                  wireframeCheck        = new QCheckBox();
                  windCheck             = new QCheckBox();
                  texturesCheck         = new QCheckBox();
@@ -61,8 +60,7 @@ MasterWidget::MasterWidget(char *filename, char *texFilename, QWidget *parent)
     QVBoxLayout *settingsLayout        = new QVBoxLayout;
 
     sphereCheck          ->setText("Sphere");
-    fixedCornersCheck    ->setText("Fixed Corners");
-    windCheck            ->setText("Wind");
+    windCheck            ->setText("Show Wind");
     wireframeCheck       ->setText("Wireframe");
     texturesCheck        ->setText("Textures");
     sphereSpinBox        ->setRange(0, 1000);
@@ -73,14 +71,13 @@ MasterWidget::MasterWidget(char *filename, char *texFilename, QWidget *parent)
     sphereFrictionSpinBox->setValue(1);
     windSpeedSpinBox     ->setRange(0, 1000);
     windSpeedSpinBox     ->setSingleStep(1);
-    windSpeedSpinBox     ->setValue(1);
+    windSpeedSpinBox     ->setValue(0);
     gravitySpinBox       ->setRange(0, 1000);
     gravitySpinBox       ->setSingleStep(1);
     gravitySpinBox       ->setValue(10);
 
 
     settingsLayout->addWidget(sphereCheck);
-    settingsLayout->addWidget(fixedCornersCheck);
     settingsLayout->addWidget(windCheck);
     settingsLayout->addWidget(wireframeCheck);
     settingsLayout->addWidget(texturesCheck);
@@ -158,7 +155,6 @@ MasterWidget::MasterWidget(char *filename, char *texFilename, QWidget *parent)
     connect(playButton,            SIGNAL(pressed()),      this,         SLOT(play()));
     connect(pauseButton,           SIGNAL(pressed()),      this,         SLOT(pause()));
     connect(timer,                 SIGNAL(timeout()),      renderWidget, SLOT(timerUpdate()));
-    connect(fixedCornersCheck,     SIGNAL(pressed()),      this,         SLOT(toggleFixedCorners()));
     connect(sphereCheck,           SIGNAL(pressed()),      this,         SLOT(toggleSphere()));
     connect(windCheck,             SIGNAL(pressed()),      this,         SLOT(toggleWind()));
     connect(wireframeCheck,        SIGNAL(pressed()),      this,         SLOT(toggleWireframe()));
@@ -322,22 +318,6 @@ void MasterWidget::stop()
  renderWidget->updateGL();
 }
 
-// keeps the corners of the cloth fixed
-void MasterWidget::toggleFixedCorners()
-{
-  if(renderWidget->sim->fixedCorners == 0)
-  {
-    renderWidget->sim->fixedCorners = 1;
-    fixedCornersCheck->setChecked(false);
-  }
-  else
-  {
-    renderWidget->sim->fixedCorners = 0;
-    fixedCornersCheck->setChecked(true);
-  }
-}
-
-
 // changes the rendering mode for the cloth
 void MasterWidget::toggleWireframe()
 {
@@ -387,15 +367,15 @@ void MasterWidget::toggleSphere()
 // turns the wind on or off
 void MasterWidget::toggleWind()
 {
-  if(renderWidget->sim->useWind == false)
+  if(renderWidget->sim->wind->show == false)
   {
     // enable control
-    renderWidget->sim->useWind = true;
+    renderWidget->sim->wind->show = true;
     windCheck->setChecked(true);
   }
   else
   {
-    renderWidget->sim->useWind = false;
+    renderWidget->sim->wind->show = false;
     windCheck->setChecked(false);
   }
 }
