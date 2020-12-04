@@ -67,6 +67,10 @@ Cloth::Cloth(const char *filename)
     tempPos = Cartesian3(curMesh.Vertices[j].Position.X,
                          curMesh.Vertices[j].Position.Y,
                          curMesh.Vertices[j].Position.Z);
+
+     // save all tex coords coming in for saving later
+     saveTexCoords.push_back(Tex(curMesh.Vertices[j].TextureCoordinate.X, curMesh.Vertices[j].TextureCoordinate.Y));
+
     // if unique add
     idx = -1;
     for(unsigned int i = 0; i < uniqueVert.size(); i++)
@@ -84,7 +88,7 @@ Cloth::Cloth(const char *filename)
       // and create a pointmass
       uniqueVert.push_back(tempPos);
       vertRef.push_back(uniqueVert.size() - 1);
-      points.push_back(PointMass(uniqueVert.back(), ballMasses));
+      points.push_back(PointMass(uniqueVert.back(), ballMasses, uniqueVert.size()));
 
       // also at this point get the texture coordiantes
       texCoords.push_back(Tex(curMesh.Vertices[j].TextureCoordinate.X, curMesh.Vertices[j].TextureCoordinate.Y));
@@ -92,7 +96,6 @@ Cloth::Cloth(const char *filename)
   }
 
   // set all the vertices to be fixed that we read from the file
-  std::cout << curMesh.Fixed.size() << '\n';
   for (unsigned int j = 0; j < curMesh.Fixed.size(); j++)
   {
     points[curMesh.Fixed[j]].fixed = true;
@@ -110,6 +113,11 @@ Cloth::Cloth(const char *filename)
     a = vertRef[a];
     b = vertRef[b];
     c = vertRef[c];
+
+    // record the indicies order for saving later
+    saveIndicies.push_back(a);
+    saveIndicies.push_back(b);
+    saveIndicies.push_back(c);
 
     // make a face out of springs
     faceSprings.clear();
@@ -148,12 +156,6 @@ Cloth::Cloth(const char *filename)
       }
     }
   }
-
-  //points[0].fixed = true;
-  // points[2].fixed = true;
-
-  // give a temporary force to one of the point masses
-  //points[1].eForces.push_back(Cartesian3(0., -9.81, 0.));ss
 
   // calculate all the colours of the points
   for(unsigned int i = 0; i < points.size(); i++)
@@ -245,8 +247,11 @@ void Cloth::Render()
       c = points[cIdx].pos;
 
       // compute and set normal
-      norm = ((a - c).cross(a - b)).normalise();
-      glNormal3f(norm.x, norm.y, norm.z);
+      // norm = ((a - c).cross(a - b)).normalise();
+      // glNormal3f(norm.x, norm.y, norm.z);
+
+      norm = ((c - a).cross(b - a)).normalise();
+      glNormal3f(-norm.x, -norm.y, -norm.z);
 
 
       // render one triangle
@@ -259,6 +264,13 @@ void Cloth::Render()
         glVertex3f(b.x, b.y, b.z);
         glTexCoord2f(texCoords[cIdx].u, texCoords[cIdx].v);
         glVertex3f(c.x, c.y, c.z);
+
+        // glTexCoord2f(texCoords[cIdx].u, texCoords[cIdx].v);
+        // glVertex3f(c.x, c.y, c.z);
+        // glTexCoord2f(texCoords[bIdx].u, texCoords[bIdx].v);
+        // glVertex3f(b.x, b.y, b.z);
+        // glTexCoord2f(texCoords[aIdx].u, texCoords[aIdx].v);
+        // glVertex3f(a.x, a.y, a.z);
       }
       // render only points, no textures
       else

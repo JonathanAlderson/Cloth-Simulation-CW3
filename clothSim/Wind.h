@@ -48,9 +48,11 @@ public:
 
    // tracks the position of all the wind particles
    int numParticles;
-   float windAngle; 
+   int trailLen;
+   int trailCount;
+   float windAngle;
    int area;  // bounding box
-   vector<Cartesian3> particles;
+   vector<vector<Cartesian3>> particles;
 
    // shows a big arrow for the wind direction
    void Render();

@@ -23,7 +23,7 @@ Plane::Plane(Cartesian3 centerIn, float widthIn, float heightIn)
 void Plane::Collision(PointMass *p)
 {
 
-  float delta = 0.01;
+  float delta = 0.5;
 
   float r = 5000. * float(rand() / RAND_MAX);
 

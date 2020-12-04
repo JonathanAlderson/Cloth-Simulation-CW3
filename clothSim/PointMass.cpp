@@ -14,12 +14,16 @@
 #include "PointMass.h"
 #include "Spring.h"
 
-PointMass::PointMass(Cartesian3 position, float massIn)
+PointMass::PointMass(Cartesian3 position, float massIn, int idIn)
 {
   // reset forces etc
   Reset();
 
+  // not fixed to begin with
   fixed = false;
+
+  // set the id
+  id = idIn;
 
   // set postion
   pos = position;

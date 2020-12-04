@@ -433,13 +433,16 @@ void RenderWidget::loadTexButtonPressed()
   std::cout << "Reading: ";
 	std::cout << newTexName.toStdString() << '\n';
 
-	std::ifstream textureStream(newTexName.toStdString().c_str());
-	texture.ReadPPM(textureStream);
-	TransferTexture();
+	if(newTexName.toStdString().length() > 0)
+	{
+		std::ifstream textureStream(newTexName.toStdString().c_str());
+		texture.ReadPPM(textureStream);
+		TransferTexture();
 
-	// reset the camera here
-	updateGL();
-	paintGL();
+		// reset the camera here
+		updateGL();
+		paintGL();
+	}
 
 }
 

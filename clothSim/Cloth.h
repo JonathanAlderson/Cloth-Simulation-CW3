@@ -67,6 +67,8 @@ class Cloth
     vector<Spring> springs;            // connecting springs
     vector<unsigned int> vertRef;      // for rendering cloth
     vector<Tex> texCoords;             // for rendering cloth
+    vector<unsigned int> saveIndicies; // so we can rewrite later
+    vector<Tex> saveTexCoords;         // so we can rewrite later
 
     // for interacting with the cloth
     Cartesian3 mouseForce;

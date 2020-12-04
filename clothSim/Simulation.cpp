@@ -33,7 +33,7 @@ Simulation::Simulation()
   // reset
 	Clear();
 
-  windParticles = 500;
+  windParticles = 100;
   showSphere   = false;
 
   sphereFriction = 1.;
@@ -55,7 +55,7 @@ Simulation::Simulation(const char *simFileName)
   // reset
 	Clear();
 
-  windParticles = 500;
+  windParticles = 100;
   showSphere   = false;
 
   sphereFriction = 1.;
@@ -112,16 +112,82 @@ void Simulation::Load(const char *filename)
 }
 
 // saves the info on the current frame as a file
+// this file reader is a bit messy
+// because of all the converstions from OBJ files to
+// sprigns and point masses and wierd indexing things
+// and back again
 void Simulation::SaveFile(std::string fileName)
 {
   ofstream  file;
   file.open(fileName);
 
-  // write file contents
-  //fileContents
-  file << fileContents;
+  //\n
+  // reusable variables
+  Cartesian3 thisAtt;
+  unsigned int aV;   // vertices for the face
+  unsigned int bV;
+  unsigned int cV;
+  unsigned int aT;   // textures for the face
+  unsigned int bT;
+  unsigned int cT;
 
-  std::cout << "Saved File" << '\n';
+  // save all point masses
+  for(unsigned int i = 0; i < cloth->points.size(); i++)
+  {
+    // get points from cloth
+    thisAtt = cloth->points[i].pos;
+
+    // Write out if the points are fixed
+    if(cloth->points[i].fixed){ file << "#f\n" ;}
+
+    // write the position
+    file << "v " << thisAtt.x << " " << thisAtt.y << " " << thisAtt.z << "\n";
+   }
+
+   // newline
+   file << "\n";
+
+
+   std::vector<unsigned int> texIndicies;
+
+   // now we have to calculate all the correct indexes for the texture coordinates
+   for(unsigned int i = 0; i < cloth->saveTexCoords.size(); i++)
+   {
+     for(unsigned int j = 0; j < cloth->texCoords.size(); j++)
+     {
+       if(cloth->saveTexCoords[i].u == cloth->texCoords[j].u && cloth->saveTexCoords[i].v == cloth->texCoords[j].v)
+       {
+         texIndicies.push_back(j);
+         break;
+       }
+     }
+   }
+
+  // save all the texture coordinates
+  for(unsigned int i = 0; i < cloth->saveTexCoords.size(); i++)
+  {
+    file << "vt" << " " << cloth->saveTexCoords[i].u << " " << cloth->saveTexCoords[i].v << "\n";
+  }
+
+  // newline
+  file << "\n";
+
+ // save all the indices
+ for(unsigned int i = 0; i < cloth->saveIndicies.size(); i+=3)
+ {
+   aV = cloth->saveIndicies[i    ] + 1;
+   bV = cloth->saveIndicies[i + 1] + 1;
+   cV = cloth->saveIndicies[i + 2] + 1;
+
+   aT = texIndicies[i    ] + 1;
+   bT = texIndicies[i + 1] + 1;
+   cT = texIndicies[i + 2] + 1;
+
+   file << "f " << aV << "/" << aT << " " << bV << "/" << bT << " " << cV << "/" << cT << "\n";
+ }
+
+   // finish up
+   file.close();
 }
 
 // updates all the physics for all the items in the scene

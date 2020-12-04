@@ -83,10 +83,12 @@ for j in range(0, m - 1):
         a = str(idx + i)
         b = str(idx + i + n)
         c = str(idx + i + 1)
-        file.write("f " + a + "/" + a + " " + b + "/" + b + " " + c + "/" + c + "\n")
+        #file.write("f " + a + "/" + a + " " + b + "/" + b + " " + c + "/" + c + "\n")
+        file.write("f " + c + "/" + c + " " + b + "/" + b + " " + a + "/" + a + "\n")
 
         # lower face
         a = str(idx + i + n)
         b = str(idx + i + n + 1)
         c = str(idx + i + 1)
-        file.write("f " + a + "/" + a + " " + b + "/" + b + " " + c + "/" + c + "\n")
+        #file.write("f " + a + "/" + a + " " + b + "/" + b + " " + c + "/" + c + "\n")
+        file.write("f " + c + "/" + c + " " + b + "/" + b + " " + a + "/" + a + "\n")

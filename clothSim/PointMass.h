@@ -51,7 +51,7 @@ class PointMass
 public:
   ~PointMass();   // destructor
 
-   PointMass(Cartesian3 position, float massIn);    // empty constructor
+   PointMass(Cartesian3 position, float massIn, int idIn);    // empty constructor
 
   // resets all the forces acting on the PointMass
   void Reset();
@@ -67,6 +67,9 @@ public:
 
   // if we can move the point mass
   bool fixed;
+
+  // everyone needs an ID
+  int id;
 
   // all the springs that are attached to the ball
   std::vector<Spring *> springs;

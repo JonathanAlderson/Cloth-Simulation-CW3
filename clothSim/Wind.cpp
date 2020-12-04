@@ -16,10 +16,11 @@
 Wind::Wind(int numParticles)
 {
   std::cout << "Wind Init" << '\n';
+  // setup
   cTime = 0.;
-
-
   area = 25;
+  trailLen = 50;
+  trailCount = 0;
   windAngle = 0;
   float randA;
   float randB;
@@ -28,13 +29,23 @@ Wind::Wind(int numParticles)
   // seed
   srand(time(NULL));
 
+  // this trail
+  std::vector<Cartesian3> thisTrail;
+  thisTrail.resize(trailLen);
+
   // add some particles randomly
   for(int i = 0; i < numParticles; i ++)
   {
     randA = (float)(rand()%(area+area+1)-area);
     randB = (float)(rand()%(area+area+1)-area);
     randC = (float)(rand()%(area+area+1)-area);
-    particles.push_back(Cartesian3(randA, randB, randC));
+
+    // adding a lot of particles
+    for(int j = 0; j < trailLen; j++)
+    {
+      thisTrail[j] = Cartesian3(randA, randB, randC);
+    }
+    particles.push_back(thisTrail);
   }
 }
 
@@ -44,16 +55,32 @@ void Wind::Render()
   if(show)
   {
     // setup opengl
-    glPointSize(3.);
-    glColor3f(0., 0., 0.); // grey colour
-    glBegin(GL_POINTS);
+    glLineWidth(2.);
+
+    glBegin(GL_LINES);
+
+    // offset for rendering trails
+    int off = (trailCount) % trailLen;
+    int first;
+    int next;
+    float col;
 
     // draw all the points
     for(unsigned int i = 0; i < particles.size(); i++)
     {
-      glVertex3f(particles[i].x, particles[i].y, particles[i].z);
+      for(unsigned int j = 0; j < trailLen -1 ; j++)
+      {
+        first = (j + off) % trailLen;
+        next = (first + 1) % trailLen;
+
+        col = (float) next / (float)trailLen;
+
+        glColor3f(1., 0., 1.); // grey colour
+        glVertex3f(particles[i][first].x, particles[i][first].y, particles[i][first].z);
+        glVertex3f(particles[i][next].x, particles[i][next].y, particles[i][next].z);
+      }
+
     }
-    std::cout << "Wind Render" << '\n';
     glEnd();
   }
 }
@@ -62,24 +89,45 @@ void Wind::Update(float dT)
 {
   cTime += dT;
 
+  int prev;
+  bool reset;
+
   // Don't waste calculation if we don't need to
   if(show && speed > 0)
   {
+    prev = ((trailCount - 1) + trailLen) % trailLen;
+
     // Update all the wind particles
     for(unsigned int i = 0; i < particles.size(); i++)
     {
-       particles[i] = particles[i] + Force(particles[i]) * dT;
+       // if the whole thing needs to teleport
+       reset = false;
+
+       // move the particle chain along one
+       particles[i][trailCount] = particles[i][prev] + Force(particles[i][prev]) * dT;
 
        // check they don't go past the bounding box
-       if(particles[i].x > area)       { particles[i].x = -area; }
-       else{ if(particles[i].x < -area){ particles[i].x = area; }}
+       if(particles[i][trailCount].x > area)       { particles[i][trailCount].x = -area; reset = true; }
+       else{ if(particles[i][trailCount].x < -area){ particles[i][trailCount].x = area; reset = true; }}
 
-       if(particles[i].y > area)       { particles[i].y = -area; }
-       else{ if(particles[i].y < -area){ particles[i].y = area; }}
+       if(particles[i][trailCount].y > area)       { particles[i][trailCount].y = -area; reset = true;}
+       else{ if(particles[i][trailCount].y < -area){ particles[i][trailCount].y = area; reset = true; }}
 
-       if(particles[i].z > area)       { particles[i].z = -area; }
-       else{ if(particles[i].z < -area){ particles[i].z = area; }}
+       if(particles[i][trailCount].z > area)       { particles[i][trailCount].z = -area; reset = true; }
+       else{ if(particles[i][trailCount].z < -area){ particles[i][trailCount].z = area; reset = true; }}
+
+       // we teleport the whole trail
+       if(reset)
+       {
+         for(unsigned int j = 0; j < trailLen; j++)
+         {
+            particles[i][j] = particles[i][trailCount];
+        }
+       }
     }
+    // increment and reset if needed
+    trailCount++;
+    if(trailCount == trailLen){ trailCount = 0; }
   }
 
   // wind changes direction randomly
