@@ -41,7 +41,7 @@ Cloth::Cloth(const char *filename)
   float dampingConstant = 10.;
 
   // for editing with the mouse
-  mouseMaxTimeout = 60;
+  mouseMaxTimeout = 10;
   mouseTimeout = 0;
   lastActivePoint = -1;
 
@@ -246,13 +246,10 @@ void Cloth::Render()
       b = points[bIdx].pos;
       c = points[cIdx].pos;
 
-      // compute and set normal
-      // norm = ((a - c).cross(a - b)).normalise();
-      // glNormal3f(norm.x, norm.y, norm.z);
-
+      // calculate intial normal
       norm = ((c - a).cross(b - a)).normalise();
-      glNormal3f(-norm.x, -norm.y, -norm.z);
 
+      glNormal3f(-norm.x, -norm.y, -norm.z);
 
       // render one triangle
       // set the texture coordinates
@@ -264,13 +261,6 @@ void Cloth::Render()
         glVertex3f(b.x, b.y, b.z);
         glTexCoord2f(texCoords[cIdx].u, texCoords[cIdx].v);
         glVertex3f(c.x, c.y, c.z);
-
-        // glTexCoord2f(texCoords[cIdx].u, texCoords[cIdx].v);
-        // glVertex3f(c.x, c.y, c.z);
-        // glTexCoord2f(texCoords[bIdx].u, texCoords[bIdx].v);
-        // glVertex3f(b.x, b.y, b.z);
-        // glTexCoord2f(texCoords[aIdx].u, texCoords[aIdx].v);
-        // glVertex3f(a.x, a.y, a.z);
       }
       // render only points, no textures
       else

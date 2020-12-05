@@ -38,6 +38,11 @@ using namespace std;
 #include <GL/glu.h>
 #endif
 
+enum INTERGRATION
+{
+  EULER,
+  VERLET,
+};
 
 class Simulation
 {
@@ -77,6 +82,9 @@ public:
 
   // for the wind visualisation
   int windParticles;
+
+  // for intergration method
+  unsigned int intergration;
 
 
   // for mouse interaction with the cloth

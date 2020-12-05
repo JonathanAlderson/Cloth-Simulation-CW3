@@ -56,7 +56,7 @@ void Wind::Render()
   {
     // setup opengl
     glLineWidth(2.);
-
+    glDisable(GL_LIGHTING);
     glBegin(GL_LINES);
 
     // offset for rendering trails
@@ -73,14 +73,15 @@ void Wind::Render()
         first = (j + off) % trailLen;
         next = (first + 1) % trailLen;
 
-        col = (float) next / (float)trailLen;
+        col = (float) j / (float)trailLen;
 
-        glColor3f(1., 0., 1.); // grey colour
+        glColor3f(col, col, col); // grey colour
         glVertex3f(particles[i][first].x, particles[i][first].y, particles[i][first].z);
         glVertex3f(particles[i][next].x, particles[i][next].y, particles[i][next].z);
       }
 
     }
+    glEnable(GL_LIGHTING);
     glEnd();
   }
 }

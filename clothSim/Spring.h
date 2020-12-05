@@ -69,7 +69,7 @@ public:
   Cartesian3 col;
 
   // does a pysics calculation based on distacnes of Pointmasses
-  void Update(float dt);
+  void Update();
 
   // updates the colour depending on the forces acting on it
   void CalculateColour();

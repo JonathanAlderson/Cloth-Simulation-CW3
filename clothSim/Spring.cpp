@@ -46,7 +46,7 @@ Spring::~Spring()
 }
 
 
-void Spring::Update(float dt)
+void Spring::Update()
 {
   // here is where the difficult physics comes in
 

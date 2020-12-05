@@ -37,6 +37,7 @@ void Plane::Collision(PointMass *p)
 
 void Plane::Render()
 {
+  glDisable(GL_LIGHTING);
   glBegin(GL_TRIANGLES);
   // glPushMatrix();
   //
@@ -57,6 +58,7 @@ void Plane::Render()
   glVertex3f(center.x + width, center.y, center.z - height);
 
   glEnd();
+  glEnable(GL_LIGHTING);
   //glPopMatrix();
 
   std::cout << "Render Plane" << '\n';

@@ -51,10 +51,11 @@ MasterWidget::MasterWidget(char *filename, char *texFilename, QWidget *parent)
                  wireframeCheck        = new QCheckBox();
                  windCheck             = new QCheckBox();
                  texturesCheck         = new QCheckBox();
+                 verletCheck           = new QCheckBox();
                  sphereSpinBox         = new QSpinBox();
     QLabel      *sphereSpinSpeedLabel  = new QLabel(tr("Spin Speed"));
                  sphereFrictionSpinBox = new QSpinBox();
-    QLabel      *sphereFrictionLabel   = new QLabel(tr("Y Gain"));
+    QLabel      *sphereFrictionLabel   = new QLabel(tr("Sphere Friction"));
                  windSpeedSpinBox      = new QSpinBox();
     QLabel      *windSpeedSpinBoxLabel = new QLabel(tr("Wind Speed"));
                  gravitySpinBox        = new QSpinBox();
@@ -65,6 +66,7 @@ MasterWidget::MasterWidget(char *filename, char *texFilename, QWidget *parent)
     windCheck            ->setText("Show Wind");
     wireframeCheck       ->setText("Wireframe");
     texturesCheck        ->setText("Textures");
+    verletCheck          ->setText("Verlet");
     sphereSpinBox        ->setRange(0, 1000);
     sphereSpinBox        ->setSingleStep(1);
     sphereSpinBox        ->setValue(1);
@@ -83,6 +85,7 @@ MasterWidget::MasterWidget(char *filename, char *texFilename, QWidget *parent)
     settingsLayout->addWidget(windCheck);
     settingsLayout->addWidget(wireframeCheck);
     settingsLayout->addWidget(texturesCheck);
+    settingsLayout->addWidget(verletCheck);
     settingsLayout->addWidget(sphereSpinSpeedLabel);
     settingsLayout->addWidget(sphereSpinBox);
     settingsLayout->addWidget(sphereFrictionLabel);
@@ -161,7 +164,8 @@ MasterWidget::MasterWidget(char *filename, char *texFilename, QWidget *parent)
     connect(sphereCheck,           SIGNAL(pressed()),      this,         SLOT(toggleSphere()));
     connect(windCheck,             SIGNAL(pressed()),      this,         SLOT(toggleWind()));
     connect(wireframeCheck,        SIGNAL(pressed()),      this,         SLOT(toggleWireframe()));
-    connect(texturesCheck,        SIGNAL(pressed()),      this,         SLOT(toggleTextures()));
+    connect(texturesCheck,         SIGNAL(pressed()),      this,         SLOT(toggleTextures()));
+    connect(verletCheck,           SIGNAL(pressed()),      this,         SLOT(toggleVerlet()));
 
     timer->start(16);
 }
@@ -392,6 +396,21 @@ void MasterWidget::toggleWind()
   {
     renderWidget->sim->wind->show = false;
     windCheck->setChecked(false);
+  }
+}
+
+// turns on and off verlet intergration
+void MasterWidget::toggleVerlet()
+{
+  if(renderWidget->sim->intergration == EULER)
+  {
+    renderWidget->sim->intergration = VERLET;
+    verletCheck->setChecked(true);
+  }
+  else
+  {
+    renderWidget->sim->intergration = EULER;
+    verletCheck->setChecked(false);
   }
 }
 

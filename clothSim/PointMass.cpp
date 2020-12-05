@@ -28,6 +28,9 @@ PointMass::PointMass(Cartesian3 position, float massIn, int idIn)
   // set postion
   pos = position;
 
+  // set previous position
+  prevPos = pos;
+
   // set the mass
   mass = massIn;
 

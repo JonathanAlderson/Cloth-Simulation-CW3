@@ -61,6 +61,7 @@ private:
     QCheckBox    *windCheck;
     QCheckBox    *wireframeCheck;
     QCheckBox    *texturesCheck;
+    QCheckBox    *verletCheck;
     QSpinBox     *sphereSpinBox;
     QSpinBox     *sphereFrictionSpinBox;
     QSpinBox     *windSpeedSpinBox;
@@ -76,6 +77,7 @@ public slots:
   void toggleWireframe();
   void toggleTextures();
   void toggleWind();
+  void toggleVerlet();
   void sphereFrictionUpdate(int i);
   void sphereSpinUpdate(int i);
   void gravityUpdate(int i);

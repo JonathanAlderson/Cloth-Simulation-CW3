@@ -39,6 +39,9 @@ Simulation::Simulation()
   sphereFriction = 1.;
   sphereSpin     = 1.;
 
+  // controlled by a checkbox
+  intergration = EULER;
+
   // initialise wind
   wind = new Wind(windParticles);
   wind->speed = 0;
@@ -61,6 +64,9 @@ Simulation::Simulation(const char *simFileName)
   sphereFriction = 1.;
   sphereSpin     = 1.;
 
+  // controlled by a checkbox
+  intergration = EULER;
+  
   // init cloth with obj file
   cloth = new Cloth(simFileName);
 
@@ -212,7 +218,7 @@ void Simulation::Update(float dT)
   // of the items in the scene
   for(unsigned int i = 0; i < cloth->springs.size(); i++)
   {
-     cloth->springs[i].Update(dT);
+     cloth->springs[i].Update();
   }
 
   // apply windy forces on all the particles if they want it
@@ -230,14 +236,11 @@ void Simulation::Update(float dT)
      cloth->points[i].CalculateTotalForce();
    }
 
-  // If we are in Euler Mode
-  EulerUpdate(dT);
+  // standard to Euler
+  if(intergration == EULER){ EulerUpdate(dT); }
 
   // If we are in fancy Verlet mode
-  //VerletUpdate(dT);
-
-  // Now calcualte the forces exerted by all the
-  // springs in the system
+  if(intergration == VERLET){ VerletUpdate(dT); }
 }
 
 void Simulation::EulerUpdate(float dT)
@@ -278,11 +281,20 @@ void Simulation::VerletUpdate(float dT)
   Cartesian3 rt0;    // position before
   Cartesian3 at1;    // acceleration 1
   Cartesian3 vt1;    // velocity 1
-  Cartesian3 vtHalf; //velocity half step in front
+  std::vector<Cartesian3> vtHalf; //velocity half step in front
   Cartesian3 fNet;   // net forces
   float      m;      // mass of the object
 
-  // for every pointMass in the cloth
+  // just in case
+  vtHalf.clear();
+
+
+  /////////////////////////
+  // INITIAL CALCULATIONS
+  /////////////////////////
+
+  // find updated point positions
+  // and half step velocity for all points
   for(unsigned int i = 0; i < cloth->points.size(); i ++)
   {
     // only move if the point is not fixed
@@ -296,16 +308,61 @@ void Simulation::VerletUpdate(float dT)
       m    = cloth->points[i].mass;
 
       // update position
-      cloth->points[i].pos = (rt1 * 2.) - rt0 + (fNet / m) * (dT * dT);
+      //cloth->points[i].pos = (rt1 * 2.) - rt0 + ((fNet / m) * (dT * dT));
+      cloth->points[i].pos = rt1 + (vt1 * dT) + ((fNet / m) * (0.5 * dT * dT));
+
+      // find full velocity step for calculating F(t2)
+      cloth->points[i].vel = ((cloth->points[i].pos - rt1) / (dT));
 
       // find half velocity step
-      vtHalf = vt1 + (fNet / m) * dT;
+      vtHalf.push_back(vt1 + (fNet / m) * (0.5 * dT));
+    }
+  }
+
+  /////////////////////////////////
+  // RECALCULATION AFTER HALF STEP
+  /////////////////////////////////
+
+  // now recalculate all the spring forces
+  for(unsigned int i = 0; i < cloth->springs.size(); i++)
+  {
+     cloth->springs[i].Update();
+  }
+
+  // apply windy forces on all the particles if they want it
+  if(wind->speed > 0)
+  {
+    for(unsigned int i = 0; i < cloth->points.size(); i++)
+    {
+      cloth->points[i].eForces[WIND] = wind->Force(cloth->points[i].pos);
+    }
+  }
+
+  // now find the new forces acting on the point masses
+  for(unsigned int i = 0; i < cloth->points.size(); i++)
+  {
+     cloth->points[i].CalculateTotalForce();
+  }
+
+  ///////////////////////
+  // APPLY FINAL CHANGES
+  ///////////////////////
+  for(unsigned int i = 0; i < cloth->points.size(); i ++)
+  {
+    // only move if the point is not fixed
+    if(cloth->points[i].fixed == false)
+    {
+      m    = cloth->points[i].mass;
+      fNet = cloth->points[i].cForce;
 
       // update acceleration
       cloth->points[i].acc = fNet / m;
 
-      // update velocity
-      cloth->points[i].vel = vt1 + (fNet / m) * dT;
+      // average velocity from first and second step
+      cloth->points[i].vel = vtHalf[i] + (fNet / m) * (0.5 * dT);
+
+      // update previous position for next time
+      cloth->points[i].prevPos = cloth->points[i].pos;
     }
   }
 }
