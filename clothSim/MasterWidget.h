@@ -32,7 +32,7 @@
 #include <QWheelEvent>
 #include <QCoreApplication>
 #include <QCheckBox>
-
+#include <QComboBox>
 
 class RenderWidget;
 
@@ -57,7 +57,6 @@ private:
     QPushButton  *loadOBJButton;
     QPushButton  *loadTexButton;
     QTimer       *timer;
-    QCheckBox    *sphereCheck;
     QCheckBox    *windCheck;
     QCheckBox    *wireframeCheck;
     QCheckBox    *texturesCheck;
@@ -66,6 +65,10 @@ private:
     QSpinBox     *sphereFrictionSpinBox;
     QSpinBox     *windSpeedSpinBox;
     QSpinBox     *gravitySpinBox;
+    QSpinBox     *springConstSpinBox;
+    QSpinBox     *dampConstSpinBox;
+    QSpinBox     *updatesSpinBox;
+    QComboBox    *sceneSelector;
 
 // playback controls
 public slots:
@@ -73,7 +76,6 @@ public slots:
   void play();
   void stop();
   void playPause();
-  void toggleSphere();
   void toggleWireframe();
   void toggleTextures();
   void toggleWind();
@@ -82,6 +84,10 @@ public slots:
   void sphereSpinUpdate(int i);
   void gravityUpdate(int i);
   void windSpeedUpdate(int i);
+  void springConstUpdate(int i);
+  void dampConstUpdate(int i);
+  void updatesUpdate(int i);
+  void updateScene(int i);
 
 };
 

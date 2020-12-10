@@ -8,7 +8,7 @@ m = int(sys.argv[2])
 z = 0
 
 # cloth scale
-scl = int(sys.argv[3])
+scl = float(sys.argv[3])
 
 # rotate 90 degrees
 rotate = False
@@ -43,7 +43,7 @@ for i in range(0, m):
         if(rotate == False):
             savePos = [currPos[0], currPos[1], 0]
         else:
-            savePos = [currPos[0], 0, -currPos[1]]
+            savePos = [currPos[0], 0, -currPos[1] - (height * 0.5)]
 
         file.write("v " + str(savePos[0]) + " " + str(savePos[1]) + " " + str(savePos[2]) + "\n")
 

@@ -17,6 +17,7 @@
 #include <math.h>
 #include <iostream>
 #include "Simulation.h"
+#include "Sphere.h"
 
 ////////////////////////////////////////////////
 // CONSTRUCTORS
@@ -25,6 +26,7 @@
 // Destructor
 Simulation::~Simulation()
 {
+  delete cloth;
   Clear();
 }
 // Empty Constructor
@@ -34,10 +36,11 @@ Simulation::Simulation()
 	Clear();
 
   windParticles = 100;
-  showSphere   = false;
 
   sphereFriction = 1.;
   sphereSpin     = 1.;
+
+  updatesPerFrame = 10;
 
   // controlled by a checkbox
   intergration = EULER;
@@ -46,8 +49,11 @@ Simulation::Simulation()
   wind = new Wind(windParticles);
   wind->speed = 0;
 
+  // initialise the sphere
+  spheres.clear();
+
   // initialise ground plane
-  ground = new Plane(Cartesian3(0., -10., 0.), 10., 10.);
+  planes.clear();
 
   Init();
 }
@@ -59,14 +65,15 @@ Simulation::Simulation(const char *simFileName)
 	Clear();
 
   windParticles = 100;
-  showSphere   = false;
 
   sphereFriction = 1.;
   sphereSpin     = 1.;
 
+  updatesPerFrame = 1;
+
   // controlled by a checkbox
   intergration = EULER;
-  
+
   // init cloth with obj file
   cloth = new Cloth(simFileName);
 
@@ -74,8 +81,11 @@ Simulation::Simulation(const char *simFileName)
   wind = new Wind(windParticles);
   wind->speed = 0;
 
+  // initialise the sphere
+  spheres.clear();
+
   // initialise ground plane
-  ground = new Plane(Cartesian3(0., -10., 0.), 10., 10.);
+  planes.clear();
 
   Init();
 }
@@ -100,6 +110,21 @@ void  Simulation::Clear()
   cFrame   = 0;
   interval = 1./ 60.;
 }
+
+// adds a sphere to the scene
+void Simulation::AddSphere(float frictionIn, float spinIn, Cartesian3 positionIn, float radiusIn)
+{
+  Sphere *add = new Sphere(frictionIn, spinIn, positionIn, radiusIn);
+  spheres.push_back(add);
+}
+
+// adds a plane to the scene
+void Simulation::AddPlane(Cartesian3 centerIn, float widthIn, float heightIn, float frictionIn)
+{
+  Plane *add = new Plane(centerIn, widthIn, heightIn, frictionIn);
+  planes.push_back(add);
+}
+
 
 // Calculates where we are allowed to click
 void Simulation::FindGlobalPosition(Camera *camera)
@@ -200,18 +225,30 @@ void Simulation::SaveFile(std::string fileName)
 // and find out what the global positions are
 void Simulation::Update(float dT)
 {
-  std::cout << "\n\n\n-------------------------" << std::endl;
-
-  // update the wind in our scene
-  wind->Update(dT);
 
   // call the cloths update function
   cloth->Update(dT);
 
+  // spin the ball a little bit
+  for(unsigned int i = 0; i < spheres.size(); i++)
+  {
+    spheres[i]->Update(dT);
+  }
+
   // Check for gound plane intersections with our pointmasses
   for(unsigned int i = 0; i < cloth->points.size(); i++)
   {
-    ground->Collision(&(cloth->points[i]));
+    // calcuale collision for all ground planes
+    for(unsigned int j = 0; j < planes.size(); j++)
+    {
+      planes[j]->Collision(&(cloth->points[i]));
+    }
+
+    // calculate collisions for all spheres
+    for(unsigned int j = 0; j < spheres.size(); j++)
+    {
+      spheres[j]->Collision(&(cloth->points[i]));
+    }
   }
 
   // Calcualte all the new positions and velocities
@@ -234,7 +271,9 @@ void Simulation::Update(float dT)
   for(unsigned int i = 0; i < cloth->points.size(); i++)
   {
      cloth->points[i].CalculateTotalForce();
-   }
+  }
+
+
 
   // standard to Euler
   if(intergration == EULER){ EulerUpdate(dT); }
@@ -370,10 +409,23 @@ void Simulation::VerletUpdate(float dT)
 // large render call, renders all the objects in the scene
 void Simulation::Render(int frameNo, Camera *camera)
 {
+
+  // update the wind in our scene
+  wind->Update(1. / 60.);
+
   cloth->Render();
-  // ball->Render();
   wind->Render();
 
-  ground->Render();
+  // render all the spheres
+  for(unsigned int i = 0; i < spheres.size(); i++)
+  {
+    spheres[i]->Render();
+  }
+
+  // render all ground planes
+  for(unsigned int i = 0; i < planes.size(); i++)
+  {
+    planes[i]->Render();
+  }
 
 }

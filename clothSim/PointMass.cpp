@@ -42,6 +42,7 @@ PointMass::PointMass(Cartesian3 position, float massIn, int idIn)
   eForces.push_back(Cartesian3(0., 0., 0.));   // wind
   eForces.push_back(Cartesian3(0., 0., 0.));   // mouse
   eForces.push_back(Cartesian3(0., 0., 0.));   // gravity
+  eForces.push_back(Cartesian3(0., 0., 0.));   // collision
 
 }
 

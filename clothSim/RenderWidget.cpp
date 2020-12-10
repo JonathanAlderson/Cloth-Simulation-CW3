@@ -55,7 +55,7 @@ RenderWidget::RenderWidget(char *filename, char *texFilename, MasterWidget *pare
 
 		// timer Setup
 		cTime = 0.;
-		cFrame = 0;
+		renderFrame = 0;
 		paused = true;
 		playbackSpeed = 1.0;
 
@@ -234,12 +234,8 @@ void RenderWidget::paintGL()
 	//glTranslatef(-xTrans, -yTrans, zTrans - 25.);
 
 	// Render Simulation
-	sim->Render(cFrame, &camera);
+	sim->Render(renderFrame, &camera);
 
-	//glTranslatef(xTrans, yTrans, -(zTrans - 25.));
-
-	// render the control points
-	//bvh->RenderControlPoints();
 	} // RenderWidget::paintGL()
 
 // mouse-handling
@@ -316,32 +312,6 @@ void RenderWidget::mouseMoveEvent(QMouseEvent *event)
 		sim->cloth->ApplyForce(mouseMove);
 		updateGL();
 
-		// if(doneOnce != true)
-		// {
-		//
-		// 	std::cout << "Mouse Movement" << '\n';
-		// 	for(int i = 0; i < 3; i++)
-		// 	{
-		// 		std::cout << mouseMove[i] << "  ";
-		// 	}
-		// 	// global positoin before
-		// 	std::cout << "Global Positoin" << '\n';
-		// 	std::cout << bvh->joints[22]->name << '\n';
-		// 	std::cout << bvh->globalPositions[22*3] << " " << bvh->globalPositions[22*3 + 1] << " " << bvh->globalPositions[22*3 + 2] << '\n';
-		//
-		// 	// move one joint
-		// 	bvh->MoveJoint(mousePicker->closest, mouseMove, 1);
-		//
-		//
-		// 	doneOnce = true;
-		// }
-		// else
-		// {
-		// 	std::cout << "Global Positoin After" << '\n';
-		// 	std::cout << bvh->joints[22]->name << '\n';
-		// 	std::cout << bvh->globalPositions[22*3] << " " << bvh->globalPositions[22*3 + 1] << " " << bvh->globalPositions[22*3 + 2] << '\n';
-		//
-		// }
 	}
 
 	// only move the camera if we are not dragging
@@ -411,7 +381,7 @@ void RenderWidget::loadOBJButtonPressed()
 		// reset default values
 		zoom = 1.0;
 		cTime = 0.;
-		cFrame = 0;
+		renderFrame = 0;
 
 		sim = new Simulation(newFileName.toStdString().c_str());
 		sim->FindGlobalPosition(&camera);
@@ -482,39 +452,24 @@ void RenderWidget::timerUpdate()
 
 	qint64 delta = lastTime.msecsTo(thisTime);
 
-
 	bool updateNeeded = false;
-
-	if(fwd){ camera.ProcessKeyboard(FORWARD , delta / 300.); }
-	if(lft){ camera.ProcessKeyboard(LEFT    , delta / 300.); }
-	if(rht){ camera.ProcessKeyboard(RIGHT   , delta / 300.); }
-	if(bkw){ camera.ProcessKeyboard(BACKWARD, delta / 300.); }
-	if(upp){ camera.ProcessKeyboard(UP      , delta / 300.); }
-	if(dwn){ camera.ProcessKeyboard(DOWN    , delta / 300.); }
-
-	if(fwd || lft || rht || bkw || upp || dwn)
-	{
-		updateNeeded = true;
-	}/* message */
 
 	// Control Playback
 	if(paused == false)
 	{
 		// MS Conversion
 		cTime += delta * playbackSpeed;
-
-		int frame = (int)((cTime / (sim->interval * 1000))) % (int)(sim->numFrame);
-
-		std::cout << "frame " << frame << '\n';
+		int thisRenderframe = (int)((cTime / ((1. / 60.) * 1000))) % (int)(sim->numFrame);
 
 		// Only Update If We need To
-		if(frame != cFrame)
+		if(thisRenderframe != renderFrame)
 		{
-			cFrame = frame;
+			for(int i = 0; i < sim->updatesPerFrame; i++)
+			{
+				sim->Update((1. / 60.) / sim->updatesPerFrame);
+			}
+			// actually redraw the screen
 			updateNeeded = true;
-
-			// do a physics update for the simulation
-			sim->Update(delta / 1000.);
 		}
 	}
 
@@ -522,13 +477,33 @@ void RenderWidget::timerUpdate()
 	lastTime = thisTime;
 
 	// update the frame if needed
-	if(updateNeeded)
+	if(updateNeeded || paused == true)
 	{
-		// draw to the screen
-		updateGL();
+		// Do camera movement
+		// so we only check this 60 times a second, instead of 1000
+		if(fwd){ camera.ProcessKeyboard(FORWARD , delta / 300.); }
+		if(lft){ camera.ProcessKeyboard(LEFT    , delta / 300.); }
+		if(rht){ camera.ProcessKeyboard(RIGHT   , delta / 300.); }
+		if(bkw){ camera.ProcessKeyboard(BACKWARD, delta / 300.); }
+		if(upp){ camera.ProcessKeyboard(UP      , delta / 300.); }
+		if(dwn){ camera.ProcessKeyboard(DOWN    , delta / 300.); }
 
-		// update the global positions
-		sim->FindGlobalPosition(&camera);
-		mousePicker->UpdateTargetPoints(&(sim->globalPositions));
+		if(fwd || lft || rht || bkw || upp || dwn)
+		{
+			updateNeeded = true;
+		}
+
+		if(updateNeeded)
+		{
+			std::cout << "Updating" << '\n';
+
+			// draw to the screen
+			updateGL();
+
+			// update the global positions
+			sim->FindGlobalPosition(&camera);
+			mousePicker->UpdateTargetPoints(&(sim->globalPositions));
+		}
+
 	}
 }

@@ -70,8 +70,7 @@ void Spring::Update()
   Cartesian3 vels = (p2Vel - p1Vel);
   float dot = vels.x * unitVec.x + vels.y * unitVec.y + vels.z * unitVec.z;
   force = force +(unitVec * (-dampingConst * dot));
-
-
+  
   // finally update the colour
   CalculateColour();
 }

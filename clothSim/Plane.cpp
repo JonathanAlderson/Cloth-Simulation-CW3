@@ -13,38 +13,70 @@
 
 #include "Plane.h"
 
-Plane::Plane(Cartesian3 centerIn, float widthIn, float heightIn)
+Plane::Plane(Cartesian3 centerIn, float widthIn, float heightIn, float frictionIn)
 {
   center = centerIn;
   width = widthIn;
   height = heightIn;
+
+  // for collision detection
+  delta = 0.4;
+
+  friction = frictionIn;
+
+
+
 }
 
 void Plane::Collision(PointMass *p)
 {
 
-  float delta = 0.5;
 
-  float r = 5000. * float(rand() / RAND_MAX);
 
-  if(p->pos.y <= center.y)
+  // if at the right height
+  if(BoundsCheck(p->pos))
   {
+    // set position
     p->pos.y = center.y + delta;
-    p->acc = Cartesian3(0., 0., 0.);
-    p->vel = Cartesian3(r, 0., -r);
+
+    // add an external force upwards
+    // and a frictional force
+    p->eForces[COLLISION] = Cartesian3(-friction * (p->vel.x), -p->eForces[GRAVITY].y, -friction * (p->vel.z));
+
   }
+
+  else
+  {
+    // reset external forces
+    p->eForces[COLLISION] = Cartesian3(0., 0., 0.);
+  }
+}
+
+bool Plane::BoundsCheck(Cartesian3 pos)
+{
+  bool ret = false;
+
+  // if at the right height
+  if(pos.y <= center.y + delta && pos.y > center.y - 2.*delta)
+  {
+    // if in the bounding box
+    if(pos.x > center.x - width && pos.x < center.x + width && pos.z > center.z - height && pos.z < center.z + height)
+    {
+      ret = true;
+    }
+  }
+
+  return ret;
 }
 
 void Plane::Render()
 {
   glDisable(GL_LIGHTING);
+  glDisable(GL_TEXTURE_2D);
   glBegin(GL_TRIANGLES);
-  // glPushMatrix();
-  //
-  // glTranslatef(center.x, center.y, center.z);
 
-  // dark blue plane
-  glColor3f(0., 0.8, 0.8);
+  // plane colour goes from red to blue depending on friction
+  glColor3f(friction, 0.0, (1. - friction));
   glNormal3f(0., 1., 0.); // static normal
 
   // lower triangle
@@ -59,7 +91,5 @@ void Plane::Render()
 
   glEnd();
   glEnable(GL_LIGHTING);
-  //glPopMatrix();
-
-  std::cout << "Render Plane" << '\n';
+  glEnable(GL_TEXTURE_2D);
 }

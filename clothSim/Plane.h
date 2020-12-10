@@ -31,7 +31,7 @@ class Plane
 
     ~Plane(); // destructor
 
-    Plane(Cartesian3 centerIn, float widthIn, float heightIn);
+    Plane(Cartesian3 centerIn, float widthIn, float heightIn, float frictionIn);
 
     // Renders the Plane
     void Render();
@@ -40,10 +40,17 @@ class Plane
     // Checks for a collision against p
     void Collision(PointMass *p);
 
+    // bounds check
+    bool BoundsCheck(Cartesian3 pos);
+
     // plane dimensions
     Cartesian3 center;
     float width;
     float height;
+
+    // for collision detection
+    float delta;
+    float friction;
 };
 
 #endif // _PLANE_H_

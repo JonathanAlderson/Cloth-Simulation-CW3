@@ -676,8 +676,6 @@ namespace objl
 				// Check for fixed vertices
 				if(algorithm::firstToken(curline) == "#f")
 				{
-					std::cout << "Haha Yes My Dude" << '\n';
-					std::cout << Positions.size() << '\n';
 					Fixed.push_back(Positions.size());
 				}
 			}

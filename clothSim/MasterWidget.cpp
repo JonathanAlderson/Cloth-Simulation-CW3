@@ -37,32 +37,45 @@ MasterWidget::MasterWidget(char *filename, char *texFilename, QWidget *parent)
     QPushButton *loadOBJButton     = new QPushButton("Load OBJ", this);
     QPushButton *loadTexButton     = new QPushButton("Load Texture", this);
     QPushButton *saveButton        = new QPushButton("Save", this);
+                 sceneSelector     = new QComboBox();
     QVBoxLayout *saveLoadLayout    = new QVBoxLayout;
 
+
+    sceneSelector->addItem("Empty Scene");
+    sceneSelector->addItem("SS1 - Free Fall Sphere");
+    sceneSelector->addItem("SS2 - Fixed Corners");
+    sceneSelector->addItem("SS3 - Spinning Sphere");
+    sceneSelector->addItem("SS3 - Wind Blowing");
+    sceneSelector->addItem("Waving Flag");
 
     saveLoadLayout->addWidget(loadOBJButton);
     saveLoadLayout->addWidget(loadTexButton);
     saveLoadLayout->addWidget(saveButton);
+    saveLoadLayout->addWidget(sceneSelector);
     saveLoadGroup ->setLayout(saveLoadLayout);
 
     // Settings
-    QGroupBox   *settingsGroup         = new QGroupBox(tr("Settings"));
-                 sphereCheck           = new QCheckBox();
-                 wireframeCheck        = new QCheckBox();
-                 windCheck             = new QCheckBox();
-                 texturesCheck         = new QCheckBox();
-                 verletCheck           = new QCheckBox();
-                 sphereSpinBox         = new QSpinBox();
-    QLabel      *sphereSpinSpeedLabel  = new QLabel(tr("Spin Speed"));
-                 sphereFrictionSpinBox = new QSpinBox();
-    QLabel      *sphereFrictionLabel   = new QLabel(tr("Sphere Friction"));
-                 windSpeedSpinBox      = new QSpinBox();
-    QLabel      *windSpeedSpinBoxLabel = new QLabel(tr("Wind Speed"));
-                 gravitySpinBox        = new QSpinBox();
-    QLabel      *gravitySpinBoxLabel   = new QLabel(tr("Gravity"));
-    QVBoxLayout *settingsLayout        = new QVBoxLayout;
+    QGroupBox   *settingsGroup           = new QGroupBox(tr("Settings"));
+                 wireframeCheck          = new QCheckBox();
+                 windCheck               = new QCheckBox();
+                 texturesCheck           = new QCheckBox();
+                 verletCheck             = new QCheckBox();
+                 sphereSpinBox           = new QSpinBox();
+    QLabel      *sphereSpinSpeedLabel    = new QLabel(tr("Spin Speed"));
+                 sphereFrictionSpinBox   = new QSpinBox();
+    QLabel      *sphereFrictionLabel     = new QLabel(tr("Sphere Friction"));
+                 windSpeedSpinBox        = new QSpinBox();
+    QLabel      *windSpeedSpinBoxLabel   = new QLabel(tr("Wind Speed"));
+                 gravitySpinBox          = new QSpinBox();
+    QLabel      *gravitySpinBoxLabel     = new QLabel(tr("Gravity"));
+                 springConstSpinBox      = new QSpinBox();
+    QLabel      *springConstSpinBoxLabel = new QLabel(tr("Spring Constant"));
+                 dampConstSpinBox        = new QSpinBox();
+    QLabel      *dampConstSpinBoxLabel   = new QLabel(tr("Spring Dampening"));
+                 updatesSpinBox          = new QSpinBox();
+    QLabel      *updateSpinBoxLabel      = new QLabel(tr("Updates Per Frame"));
+    QVBoxLayout *settingsLayout          = new QVBoxLayout;
 
-    sphereCheck          ->setText("Sphere");
     windCheck            ->setText("Show Wind");
     wireframeCheck       ->setText("Wireframe");
     texturesCheck        ->setText("Textures");
@@ -79,9 +92,17 @@ MasterWidget::MasterWidget(char *filename, char *texFilename, QWidget *parent)
     gravitySpinBox       ->setRange(0, 1000);
     gravitySpinBox       ->setSingleStep(1);
     gravitySpinBox       ->setValue(10);
+    springConstSpinBox   ->setRange(0, 1000);
+    springConstSpinBox   ->setSingleStep(5);
+    springConstSpinBox   ->setValue(100);
+    dampConstSpinBox     ->setRange(0, 1000);
+    dampConstSpinBox     ->setSingleStep(1);
+    dampConstSpinBox     ->setValue(10);
+    updatesSpinBox       ->setRange(1, 100);
+    updatesSpinBox       ->setSingleStep(5);
+    updatesSpinBox       ->setValue(10);
 
 
-    settingsLayout->addWidget(sphereCheck);
     settingsLayout->addWidget(windCheck);
     settingsLayout->addWidget(wireframeCheck);
     settingsLayout->addWidget(texturesCheck);
@@ -94,6 +115,12 @@ MasterWidget::MasterWidget(char *filename, char *texFilename, QWidget *parent)
     settingsLayout->addWidget(windSpeedSpinBox);
     settingsLayout->addWidget(gravitySpinBoxLabel);
     settingsLayout->addWidget(gravitySpinBox);
+    settingsLayout->addWidget(springConstSpinBoxLabel);
+    settingsLayout->addWidget(springConstSpinBox);
+    settingsLayout->addWidget(dampConstSpinBoxLabel);
+    settingsLayout->addWidget(dampConstSpinBox);
+    settingsLayout->addWidget(updateSpinBoxLabel);
+    settingsLayout->addWidget(updatesSpinBox);
     settingsGroup ->setLayout(settingsLayout);
 
     // playback
@@ -150,24 +177,27 @@ MasterWidget::MasterWidget(char *filename, char *texFilename, QWidget *parent)
     QObject::connect(stopShortcut,        SIGNAL(activated()), this, SLOT(stop()));
 
     // Connecting
-    connect(loadOBJButton,         SIGNAL(pressed()),      renderWidget, SLOT(loadOBJButtonPressed()));
-    connect(loadTexButton,         SIGNAL(pressed()),      renderWidget, SLOT(loadTexButtonPressed()));
-    connect(saveButton,            SIGNAL(pressed()),      renderWidget, SLOT(saveButtonPressed()));
-    connect(sphereSpinBox,         SIGNAL(valueChanged(int)), this,      SLOT(sphereSpinUpdate(int)));
-    connect(sphereFrictionSpinBox, SIGNAL(valueChanged(int)), this,      SLOT(sphereFrictionUpdate(int)));
-    connect(windSpeedSpinBox,      SIGNAL(valueChanged(int)), this,      SLOT(windSpeedUpdate(int)));
-    connect(gravitySpinBox,        SIGNAL(valueChanged(int)), this,      SLOT(gravityUpdate(int)));
-    connect(stopButton,            SIGNAL(pressed()),      this,         SLOT(stop()));
-    connect(playButton,            SIGNAL(pressed()),      this,         SLOT(play()));
-    connect(pauseButton,           SIGNAL(pressed()),      this,         SLOT(pause()));
-    connect(timer,                 SIGNAL(timeout()),      renderWidget, SLOT(timerUpdate()));
-    connect(sphereCheck,           SIGNAL(pressed()),      this,         SLOT(toggleSphere()));
-    connect(windCheck,             SIGNAL(pressed()),      this,         SLOT(toggleWind()));
-    connect(wireframeCheck,        SIGNAL(pressed()),      this,         SLOT(toggleWireframe()));
-    connect(texturesCheck,         SIGNAL(pressed()),      this,         SLOT(toggleTextures()));
-    connect(verletCheck,           SIGNAL(pressed()),      this,         SLOT(toggleVerlet()));
+    connect(loadOBJButton,         SIGNAL(pressed()),                renderWidget, SLOT(loadOBJButtonPressed()));
+    connect(loadTexButton,         SIGNAL(pressed()),                renderWidget, SLOT(loadTexButtonPressed()));
+    connect(saveButton,            SIGNAL(pressed()),                renderWidget, SLOT(saveButtonPressed()));
+    connect(sphereSpinBox,         SIGNAL(valueChanged(int)),        this,      SLOT(sphereSpinUpdate(int)));
+    connect(sphereFrictionSpinBox, SIGNAL(valueChanged(int)),        this,      SLOT(sphereFrictionUpdate(int)));
+    connect(windSpeedSpinBox,      SIGNAL(valueChanged(int)),        this,      SLOT(windSpeedUpdate(int)));
+    connect(gravitySpinBox,        SIGNAL(valueChanged(int)),        this,      SLOT(gravityUpdate(int)));
+    connect(springConstSpinBox,    SIGNAL(valueChanged(int)),        this,      SLOT(springConstUpdate(int)));
+    connect(dampConstSpinBox,      SIGNAL(valueChanged(int)),        this,      SLOT(dampConstUpdate(int)));
+    connect(updatesSpinBox,        SIGNAL(valueChanged(int)),        this,      SLOT(updatesUpdate(int)));
+    connect(sceneSelector,         SIGNAL(currentIndexChanged(int)), this,      SLOT(updateScene(int)));
+    connect(stopButton,            SIGNAL(pressed()),                this,         SLOT(stop()));
+    connect(playButton,            SIGNAL(pressed()),                this,         SLOT(play()));
+    connect(pauseButton,           SIGNAL(pressed()),                this,         SLOT(pause()));
+    connect(timer,                 SIGNAL(timeout()),                renderWidget, SLOT(timerUpdate()));
+    connect(windCheck,             SIGNAL(pressed()),                this,         SLOT(toggleWind()));
+    connect(wireframeCheck,        SIGNAL(pressed()),                this,         SLOT(toggleWireframe()));
+    connect(texturesCheck,         SIGNAL(pressed()),                this,         SLOT(toggleTextures()));
+    connect(verletCheck,           SIGNAL(pressed()),                this,         SLOT(toggleVerlet()));
 
-    timer->start(16);
+    timer->start(1);
 }
 
 // Default slider params
@@ -367,22 +397,6 @@ void MasterWidget::toggleTextures()
   }
 }
 
-// Makes the sphere visible and in the scene
-void MasterWidget::toggleSphere()
-{
-  if(renderWidget->sim->showSphere == false)
-  {
-    // enable dampening
-    renderWidget->sim->showSphere = true;
-    sphereCheck->setChecked(true);
-  }
-  else
-  {
-    renderWidget->sim->showSphere = false;
-    sphereCheck->setChecked(false);
-  }
-}
-
 // turns the wind on or off
 void MasterWidget::toggleWind()
 {
@@ -418,22 +432,177 @@ void MasterWidget::toggleVerlet()
 void MasterWidget::sphereFrictionUpdate(int i)
 {
   renderWidget->sim->sphereFriction = i;
+
+  sphereFrictionSpinBox->setValue(i);
 }
 
 // update sphere rotation
 void MasterWidget::sphereSpinUpdate(int i)
 {
   renderWidget->sim->sphereSpin = (float)i;
+
+  sphereSpinBox->setValue(i);
 }
 
 // update the wind speed
 void MasterWidget::windSpeedUpdate(int i)
 {
   renderWidget->sim->wind->speed = (float)i;
+
+  windSpeedSpinBox->setValue(i);
 }
 
 // update gravity of the simulation
 void MasterWidget::gravityUpdate(int i)
 {
   renderWidget->sim->cloth->UpdateGravity((float)i);
+
+  gravitySpinBox->setValue(i);
+}
+
+// update springConst of the simulation
+void MasterWidget::springConstUpdate(int i)
+{
+  for(unsigned int j = 0; j < renderWidget->sim->cloth->springs.size(); j++)
+  {
+    renderWidget->sim->cloth->springs[j].springConst = (float) i;
+  }
+
+  springConstSpinBox->setValue(i);
+}
+
+// update dampConst of the simulation
+void MasterWidget::dampConstUpdate(int i)
+{
+  for(unsigned int j = 0; j < renderWidget->sim->cloth->springs.size(); j++)
+  {
+    renderWidget->sim->cloth->springs[j].dampingConst = (float) i;
+  }
+
+  dampConstSpinBox->setValue(i);
+}
+
+// the amount of times per frame we do a simlulation
+void MasterWidget::updatesUpdate(int i)
+{
+  renderWidget->sim->updatesPerFrame = i;
+
+  updatesSpinBox->setValue(i);
+}
+
+
+// changes the whole scene and everything to do with it!
+// This whole part could be easily saved into differnet files and such but for the time being, we are just going to do it this way
+void MasterWidget::updateScene(int i)
+{
+  std::cout << "Updating Scene: " << i << '\n';
+
+  // clear everything and reset what we need to
+  renderWidget->sim->spheres.clear();
+  renderWidget->sim->planes.clear();
+  delete renderWidget->sim->cloth;
+  renderWidget->zoom = 1.0;
+  renderWidget->cTime = 0.;
+  renderWidget->renderFrame = 0;
+
+
+
+
+  // load a default cloth
+  if(i == 0)
+  {
+    // init cloth with obj file
+    renderWidget->sim = new Simulation("/home/sc17j3a/Documents/University/Animation And Simulation/animation-cw3-cloth-sim/objFiles/cloth-10x10.obj");
+
+    std::cout << "Did it1" << '\n';
+  }
+
+  // Horizontal cloth floating on sphere
+  if(i == 1)
+  {
+    renderWidget->sim = new Simulation("/home/sc17j3a/Documents/University/Animation And Simulation/animation-cw3-cloth-sim/objFiles/clothR-10x10.obj");
+    renderWidget->sim->AddSphere(0.5, 0., Cartesian3(0., -2., 0.), 2.);
+    renderWidget->sim->AddPlane(Cartesian3(0., -5., 0.), 6., 6., 1.);
+
+    gravityUpdate(10);
+    windSpeedUpdate(0);
+    springConstUpdate(400);
+    dampConstUpdate(10);
+    updatesUpdate(50);
+  }
+
+  // Horizontal Cloth Fixed Edges
+  if(i == 2)
+  {
+    renderWidget->sim = new Simulation("/home/sc17j3a/Documents/University/Animation And Simulation/animation-cw3-cloth-sim/objFiles/lockedCorners.obj");
+
+    gravityUpdate(10);
+    windSpeedUpdate(0);
+    springConstUpdate(700);
+    dampConstUpdate(50);
+    updatesUpdate(50);
+  }
+
+  // Rotating Spheres
+  if(i == 3)
+  {
+    renderWidget->sim = new Simulation("/home/sc17j3a/Documents/University/Animation And Simulation/animation-cw3-cloth-sim/objFiles/clothR-20x20.obj");
+
+    renderWidget->sim->AddSphere(0.5, 5., Cartesian3(0., -2., 0.), 2.);
+    gravityUpdate(10);
+    windSpeedUpdate(0);
+    springConstUpdate(7000);
+    dampConstUpdate(50);
+    updatesUpdate(50);
+  }
+
+
+  // Hanging and blowing in the wind
+  if(i == 4)
+  {
+    renderWidget->sim = new Simulation("/home/sc17j3a/Documents/University/Animation And Simulation/animation-cw3-cloth-sim/objFiles/lockedCorners.obj");
+
+    gravityUpdate(10);
+    windSpeedUpdate(5);
+    springConstUpdate(700);
+    dampConstUpdate(50);
+    updatesUpdate(50);
+
+    if(renderWidget->sim->wind->show == false)
+    {
+      toggleWind();
+    }
+  }
+
+  // Waving flag blowing in the wind
+  if(i == 5)
+  {
+    renderWidget->sim = new Simulation("/home/sc17j3a/Documents/University/Animation And Simulation/animation-cw3-cloth-sim/objFiles/wavingFlag.obj");
+
+    std::ifstream textureStream("/home/sc17j3a/Documents/University/Animation And Simulation/animation-cw3-cloth-sim/textures/unionJack.ppm");
+    renderWidget->texture.ReadPPM(textureStream);
+    renderWidget->TransferTexture();
+
+    gravityUpdate(3);
+    windSpeedUpdate(20);
+    springConstUpdate(1000);
+    dampConstUpdate(50);
+    updatesUpdate(50);
+
+    if(renderWidget->sim->wind->show == false)
+    {
+      toggleWind();
+    }
+
+
+  }
+
+
+  // find new global positions
+  renderWidget->sim->FindGlobalPosition(&(renderWidget->camera));
+  renderWidget->mousePicker = new MousePick(&(renderWidget->sim->globalPositions), 1.0);
+
+  // update the screen
+  renderWidget->updateGL();
+  renderWidget->paintGL();
 }

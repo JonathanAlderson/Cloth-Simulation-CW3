@@ -34,6 +34,7 @@ HEADERS += camera.h \
            RGBAImage.h \
            RGBAValue.h \
            Plane.h \
+           Sphere.h \
            Wind.h
 SOURCES += Cartesian3.cpp \
            Cloth.cpp \
@@ -48,4 +49,5 @@ SOURCES += Cartesian3.cpp \
            RGBAImage.cpp \
            RGBAValue.cpp \
            Plane.cpp \
+           Sphere.cpp \
            Wind.cpp

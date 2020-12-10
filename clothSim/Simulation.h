@@ -26,6 +26,7 @@ using namespace std;
 #include "PointMass.h"
 #include "Cloth.h"
 #include "Plane.h"
+#include "Sphere.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -76,9 +77,9 @@ public:
 
   // main pointers
   Cloth     *cloth;
-  PointMass *ball;
   Wind      *wind;
-  Plane     *ground;
+  vector<Plane *>   planes;
+  vector<Sphere *>  spheres;
 
   // for the wind visualisation
   int windParticles;
@@ -97,12 +98,10 @@ public:
   int numFrame;
   int cFrame;
   double interval;
+  int updatesPerFrame;
 
   // for saving loading
   std::string fileContents;
-
-  // bools controlled by checkboxes
-  bool showSphere;
 
   // values updated from sliders
   float sphereFriction;
@@ -124,6 +123,12 @@ public:
 
   // moves a specific part of the cloth with a force
   void MovePoint(glm::vec3 move);
+
+  // adds a sphere to the scene
+  void AddSphere(float frictionIn, float spinIn, Cartesian3 positionIn, float radiusIn);
+
+  // adds a sphere to the scene
+  void AddPlane(Cartesian3 centerIn, float widthIn, float heightIn, float frictionIn);
 
   // saves the frame as a .obj
   void SaveFile(std::string fileName);

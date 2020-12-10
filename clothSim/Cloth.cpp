@@ -19,6 +19,14 @@
 Cloth::~Cloth()
 {
   Reset();
+
+  // delete everything
+  points.clear();
+  springs.clear();
+  vertRef.clear();
+  texCoords.clear();
+  saveIndicies.clear();
+  saveTexCoords.clear();
 }
 
 // constructor
@@ -60,6 +68,14 @@ Cloth::Cloth(const char *filename)
   vertRef.clear();                      // unique references
   int idx;
 
+
+  for(unsigned int j = 0; j < curMesh.Indices.size(); j++)
+  {
+    tempPos = Cartesian3(curMesh.Vertices[curMesh.Indices[j]].Position.X,
+                         curMesh.Vertices[curMesh.Indices[j]].Position.Y,
+                         curMesh.Vertices[curMesh.Indices[j]].Position.Z);
+  }
+
   // add all unique verticies to a data structure
   for (unsigned int j = 0; j < curMesh.Vertices.size(); j++)
   {
@@ -92,6 +108,7 @@ Cloth::Cloth(const char *filename)
 
       // also at this point get the texture coordiantes
       texCoords.push_back(Tex(curMesh.Vertices[j].TextureCoordinate.X, curMesh.Vertices[j].TextureCoordinate.Y));
+
     }
   }
 
@@ -118,6 +135,7 @@ Cloth::Cloth(const char *filename)
     saveIndicies.push_back(a);
     saveIndicies.push_back(b);
     saveIndicies.push_back(c);
+
 
     // make a face out of springs
     faceSprings.clear();
@@ -216,10 +234,13 @@ void Cloth::Render()
 {
   if(wireframeRender)
   {
+    glDisable(GL_TEXTURE_2D);
     // Render All The Point Masses
     for(unsigned int i = 0; i < points.size(); i++){ points[i].Render(); }
     // Render All The Springs Between Them
     for(unsigned int i = 0; i < springs.size(); i++){ springs[i].Render(); }
+
+    glEnable(GL_TEXTURE_2D);
   }
   else
   {

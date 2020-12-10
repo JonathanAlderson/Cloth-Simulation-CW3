@@ -44,6 +44,7 @@ enum FORCES
   WIND,
   MOUSE,
   GRAVITY,
+  COLLISION,
 };
 
 class PointMass

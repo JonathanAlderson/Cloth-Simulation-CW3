@@ -63,7 +63,7 @@ class RenderWidget : public QGLWidget
 	// playback options
 	float cTime;
 	float startTime;
-	int cFrame;
+	int renderFrame;
 	bool paused;
 	float playbackSpeed;
 
