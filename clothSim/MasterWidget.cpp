@@ -60,6 +60,7 @@ MasterWidget::MasterWidget(char *filename, char *texFilename, QWidget *parent)
                  windCheck               = new QCheckBox();
                  texturesCheck           = new QCheckBox();
                  verletCheck             = new QCheckBox();
+                 recordCheck             = new QCheckBox();
                  sphereSpinBox           = new QSpinBox();
     QLabel      *sphereSpinSpeedLabel    = new QLabel(tr("Spin Speed"));
                  sphereFrictionSpinBox   = new QSpinBox();
@@ -73,13 +74,17 @@ MasterWidget::MasterWidget(char *filename, char *texFilename, QWidget *parent)
                  dampConstSpinBox        = new QSpinBox();
     QLabel      *dampConstSpinBoxLabel   = new QLabel(tr("Spring Dampening"));
                  updatesSpinBox          = new QSpinBox();
+    QLabel      *maxFramesSpinBoxLabel   = new QLabel(tr("Max Frames"));
+                 maxFramesSpinBox        = new QSpinBox();
     QLabel      *updateSpinBoxLabel      = new QLabel(tr("Updates Per Frame"));
+
     QVBoxLayout *settingsLayout          = new QVBoxLayout;
 
     windCheck            ->setText("Show Wind");
     wireframeCheck       ->setText("Wireframe");
     texturesCheck        ->setText("Textures");
     verletCheck          ->setText("Verlet");
+    recordCheck          ->setText("Record Screen");
     sphereSpinBox        ->setRange(0, 1000);
     sphereSpinBox        ->setSingleStep(1);
     sphereSpinBox        ->setValue(1);
@@ -92,7 +97,7 @@ MasterWidget::MasterWidget(char *filename, char *texFilename, QWidget *parent)
     gravitySpinBox       ->setRange(0, 1000);
     gravitySpinBox       ->setSingleStep(1);
     gravitySpinBox       ->setValue(10);
-    springConstSpinBox   ->setRange(0, 1000);
+    springConstSpinBox   ->setRange(0, 5000);
     springConstSpinBox   ->setSingleStep(5);
     springConstSpinBox   ->setValue(100);
     dampConstSpinBox     ->setRange(0, 1000);
@@ -101,12 +106,16 @@ MasterWidget::MasterWidget(char *filename, char *texFilename, QWidget *parent)
     updatesSpinBox       ->setRange(1, 100);
     updatesSpinBox       ->setSingleStep(5);
     updatesSpinBox       ->setValue(10);
+    maxFramesSpinBox     ->setRange(1, 5000);
+    maxFramesSpinBox     ->setSingleStep(30);
+    maxFramesSpinBox     ->setValue(120);
 
 
     settingsLayout->addWidget(windCheck);
     settingsLayout->addWidget(wireframeCheck);
     settingsLayout->addWidget(texturesCheck);
     settingsLayout->addWidget(verletCheck);
+    settingsLayout->addWidget(recordCheck);
     settingsLayout->addWidget(sphereSpinSpeedLabel);
     settingsLayout->addWidget(sphereSpinBox);
     settingsLayout->addWidget(sphereFrictionLabel);
@@ -121,6 +130,8 @@ MasterWidget::MasterWidget(char *filename, char *texFilename, QWidget *parent)
     settingsLayout->addWidget(dampConstSpinBox);
     settingsLayout->addWidget(updateSpinBoxLabel);
     settingsLayout->addWidget(updatesSpinBox);
+    settingsLayout->addWidget(maxFramesSpinBoxLabel);
+    settingsLayout->addWidget(maxFramesSpinBox);
     settingsGroup ->setLayout(settingsLayout);
 
     // playback
@@ -187,6 +198,7 @@ MasterWidget::MasterWidget(char *filename, char *texFilename, QWidget *parent)
     connect(springConstSpinBox,    SIGNAL(valueChanged(int)),        this,      SLOT(springConstUpdate(int)));
     connect(dampConstSpinBox,      SIGNAL(valueChanged(int)),        this,      SLOT(dampConstUpdate(int)));
     connect(updatesSpinBox,        SIGNAL(valueChanged(int)),        this,      SLOT(updatesUpdate(int)));
+    connect(maxFramesSpinBox,      SIGNAL(valueChanged(int)),        this,      SLOT(maxFramesUpdate(int)));
     connect(sceneSelector,         SIGNAL(currentIndexChanged(int)), this,      SLOT(updateScene(int)));
     connect(stopButton,            SIGNAL(pressed()),                this,         SLOT(stop()));
     connect(playButton,            SIGNAL(pressed()),                this,         SLOT(play()));
@@ -196,6 +208,7 @@ MasterWidget::MasterWidget(char *filename, char *texFilename, QWidget *parent)
     connect(wireframeCheck,        SIGNAL(pressed()),                this,         SLOT(toggleWireframe()));
     connect(texturesCheck,         SIGNAL(pressed()),                this,         SLOT(toggleTextures()));
     connect(verletCheck,           SIGNAL(pressed()),                this,         SLOT(toggleVerlet()));
+    connect(recordCheck,           SIGNAL(pressed()),                this,         SLOT(toggleRecord()));
 
     timer->start(1);
 }
@@ -428,6 +441,21 @@ void MasterWidget::toggleVerlet()
   }
 }
 
+// turns on and off recording
+void MasterWidget::toggleRecord()
+{
+  if(renderWidget->doScreenRecording == false)
+  {
+    renderWidget->doScreenRecording = true;
+    recordCheck->setChecked(true);
+  }
+  else
+  {
+    renderWidget->doScreenRecording = false;
+    recordCheck->setChecked(false);
+  }
+}
+
 // updates the sphere friction
 void MasterWidget::sphereFrictionUpdate(int i)
 {
@@ -490,6 +518,12 @@ void MasterWidget::updatesUpdate(int i)
   updatesSpinBox->setValue(i);
 }
 
+// how many frames we record for
+void MasterWidget::maxFramesUpdate(int i)
+{
+  renderWidget->maxFrames = i;
+  maxFramesSpinBox->setValue(i);
+}
 
 // changes the whole scene and everything to do with it!
 // This whole part could be easily saved into differnet files and such but for the time being, we are just going to do it this way
@@ -513,15 +547,13 @@ void MasterWidget::updateScene(int i)
   {
     // init cloth with obj file
     renderWidget->sim = new Simulation("/home/sc17j3a/Documents/University/Animation And Simulation/animation-cw3-cloth-sim/objFiles/cloth-10x10.obj");
-
-    std::cout << "Did it1" << '\n';
   }
 
   // Horizontal cloth floating on sphere
   if(i == 1)
   {
     renderWidget->sim = new Simulation("/home/sc17j3a/Documents/University/Animation And Simulation/animation-cw3-cloth-sim/objFiles/clothR-10x10.obj");
-    renderWidget->sim->AddSphere(0.5, 0., Cartesian3(0., -2., 0.), 2.);
+    renderWidget->sim->AddSphere(0.9, 0., Cartesian3(0., -2., 0.), 2.);
     renderWidget->sim->AddPlane(Cartesian3(0., -5., 0.), 6., 6., 1.);
 
     gravityUpdate(10);

@@ -49,6 +49,9 @@ class Cartesian3
 	// dotproduct routine
 	float dot(const Cartesian3 &other);
 
+	// dotproduct routine
+	Cartesian3 dotProd(const Cartesian3 &other);
+
 	// distance
 	float distance(const Cartesian3 &other);
 

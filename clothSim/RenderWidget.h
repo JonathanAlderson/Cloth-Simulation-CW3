@@ -21,10 +21,12 @@
 #include <fstream>
 #include <string>
 #include <iostream>
+#include <thread>
 #include "MousePick.h"
 #include "MasterWidget.h"
 #include "Simulation.h"
 #include "camera.h"
+#include "screenRecord.h"
 #include "RGBAImage.h"
 
 class RenderWidget : public QGLWidget
@@ -98,6 +100,12 @@ class RenderWidget : public QGLWidget
 	// texture stuff
 	GLuint textureID;
 	RGBAImage texture;
+
+	// screen recording
+	ScreenRecord * screenRecord;
+	bool doScreenRecording;
+	int maxFrames;
+	int framerate;
 
 	// Action
 	RenderWidget(char *filename, char *texFilename, MasterWidget *parent);

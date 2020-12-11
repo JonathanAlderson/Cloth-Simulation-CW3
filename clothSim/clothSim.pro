@@ -35,8 +35,14 @@ HEADERS += camera.h \
            RGBAValue.h \
            Plane.h \
            Sphere.h \
+           screenRecord.h \
+           stb_image.h \
+           stb_image_write.h \
            Wind.h
+
 SOURCES += Cartesian3.cpp \
+           imageInclude.cpp \
+           stb_image_write.cpp \
            Cloth.cpp \
            GObject.cpp \
            main.cpp \

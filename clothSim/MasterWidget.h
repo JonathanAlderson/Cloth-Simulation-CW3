@@ -61,6 +61,7 @@ private:
     QCheckBox    *wireframeCheck;
     QCheckBox    *texturesCheck;
     QCheckBox    *verletCheck;
+    QCheckBox    *recordCheck;
     QSpinBox     *sphereSpinBox;
     QSpinBox     *sphereFrictionSpinBox;
     QSpinBox     *windSpeedSpinBox;
@@ -68,6 +69,7 @@ private:
     QSpinBox     *springConstSpinBox;
     QSpinBox     *dampConstSpinBox;
     QSpinBox     *updatesSpinBox;
+    QSpinBox     *maxFramesSpinBox;
     QComboBox    *sceneSelector;
 
 // playback controls
@@ -79,6 +81,7 @@ public slots:
   void toggleWireframe();
   void toggleTextures();
   void toggleWind();
+  void toggleRecord();
   void toggleVerlet();
   void sphereFrictionUpdate(int i);
   void sphereSpinUpdate(int i);
@@ -87,6 +90,7 @@ public slots:
   void springConstUpdate(int i);
   void dampConstUpdate(int i);
   void updatesUpdate(int i);
+  void maxFramesUpdate(int i);
   void updateScene(int i);
 
 };

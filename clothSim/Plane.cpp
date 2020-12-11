@@ -41,14 +41,17 @@ void Plane::Collision(PointMass *p)
 
     // add an external force upwards
     // and a frictional force
-    p->eForces[COLLISION] = Cartesian3(-friction * (p->vel.x), -p->eForces[GRAVITY].y, -friction * (p->vel.z));
+    p->eForces[COLLISION] = Cartesian3(0., -p->eForces[GRAVITY].y, 0.);
 
+    // friction will resist the motion in the opposite direction of the total force
+    p->eForces[PFRICTION] = Cartesian3(abs(friction * p->eForces[GRAVITY].y) * -p->vel.x, 0., abs(friction * p->eForces[GRAVITY].y) * -p->vel.z);
   }
 
   else
   {
     // reset external forces
     p->eForces[COLLISION] = Cartesian3(0., 0., 0.);
+    p->eForces[PFRICTION]  = Cartesian3(0., 0., 0.);
   }
 }
 

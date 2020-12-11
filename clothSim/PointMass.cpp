@@ -43,6 +43,8 @@ PointMass::PointMass(Cartesian3 position, float massIn, int idIn)
   eForces.push_back(Cartesian3(0., 0., 0.));   // mouse
   eForces.push_back(Cartesian3(0., 0., 0.));   // gravity
   eForces.push_back(Cartesian3(0., 0., 0.));   // collision
+  eForces.push_back(Cartesian3(0., 0., 0.));   // plane friction
+  eForces.push_back(Cartesian3(0., 0., 0.));   // sphere friction
 
 }
 
@@ -69,6 +71,7 @@ void PointMass::CalculateTotalForce()
   cForce = Cartesian3(0., 0., 0.);
 
   // sum up the external forces acting on the point mass
+  // but do now include friction yet
   for(unsigned int i = 0; i < eForces.size(); i++)
   {
      cForce = cForce + eForces[i];
@@ -81,7 +84,18 @@ void PointMass::CalculateTotalForce()
     if(this == springs[i]->pmA){ cForce = cForce - springs[i]->force; }
     // pmB --> Right Hand Size
     else                        { cForce = cForce + springs[i]->force; }
-   }
+  }
+
+  // finally calcualte friciton
+
+  // if(cForce.x > 0){ cForce.x = cForce.x - min(abs(cForce.x), abs(eForces[FRICTION].x)); }
+  // else            { cForce.x = cForce.x + min(abs(cForce.x), abs(eForces[FRICTION].x)); }
+  // if(cForce.y > 0){ cForce.y = cForce.y - min(abs(cForce.y), abs(eForces[FRICTION].y)); }
+  // else            { cForce.y = cForce.y + min(abs(cForce.y), abs(eForces[FRICTION].y)); }
+  // if(cForce.z > 0){ cForce.z = cForce.z - min(abs(cForce.z), abs(eForces[FRICTION].z)); }
+  // else            { cForce.z = cForce.z + min(abs(cForce.z), abs(eForces[FRICTION].z)); }
+
+
 
    // once we have calculated total force
    // we reset anyforces that are because of the mouse

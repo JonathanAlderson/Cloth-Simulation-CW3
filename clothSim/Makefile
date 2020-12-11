@@ -51,6 +51,8 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = Cartesian3.cpp \
+		imageInclude.cpp \
+		stb_image_write.cpp \
 		Cloth.cpp \
 		GObject.cpp \
 		main.cpp \
@@ -67,6 +69,8 @@ SOURCES       = Cartesian3.cpp \
 		Wind.cpp moc_MasterWidget.cpp \
 		moc_RenderWidget.cpp
 OBJECTS       = Cartesian3.o \
+		imageInclude.o \
+		stb_image_write.o \
 		Cloth.o \
 		GObject.o \
 		main.o \
@@ -171,7 +175,12 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		RGBAValue.h \
 		Plane.h \
 		Sphere.h \
+		screenRecord.h \
+		stb_image.h \
+		stb_image_write.h \
 		Wind.h Cartesian3.cpp \
+		imageInclude.cpp \
+		stb_image_write.cpp \
 		Cloth.cpp \
 		GObject.cpp \
 		main.cpp \
@@ -369,8 +378,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents camera.h Cartesian3.h Cloth.h GObject.h MasterWidget.h matrix.h MousePick.h PointMass.h RenderWidget.h Simulation.h Spring.h RGBAImage.h RGBAValue.h Plane.h Sphere.h Wind.h $(DISTDIR)/
-	$(COPY_FILE) --parents Cartesian3.cpp Cloth.cpp GObject.cpp main.cpp MasterWidget.cpp MousePick.cpp PointMass.cpp RenderWidget.cpp Simulation.cpp Spring.cpp RGBAImage.cpp RGBAValue.cpp Plane.cpp Sphere.cpp Wind.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents camera.h Cartesian3.h Cloth.h GObject.h MasterWidget.h matrix.h MousePick.h PointMass.h RenderWidget.h Simulation.h Spring.h RGBAImage.h RGBAValue.h Plane.h Sphere.h screenRecord.h stb_image.h stb_image_write.h Wind.h $(DISTDIR)/
+	$(COPY_FILE) --parents Cartesian3.cpp imageInclude.cpp stb_image_write.cpp Cloth.cpp GObject.cpp main.cpp MasterWidget.cpp MousePick.cpp PointMass.cpp RenderWidget.cpp Simulation.cpp Spring.cpp RGBAImage.cpp RGBAValue.cpp Plane.cpp Sphere.cpp Wind.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -421,6 +430,9 @@ moc_RenderWidget.cpp: MousePick.h \
 		Wind.h \
 		Plane.h \
 		Sphere.h \
+		screenRecord.h \
+		stb_image_write.h \
+		stb_image.h \
 		RGBAImage.h \
 		RGBAValue.h \
 		RenderWidget.h \
@@ -444,6 +456,12 @@ compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean
 
 Cartesian3.o: Cartesian3.cpp Cartesian3.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Cartesian3.o Cartesian3.cpp
+
+imageInclude.o: imageInclude.cpp stb_image.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o imageInclude.o imageInclude.cpp
+
+stb_image_write.o: stb_image_write.cpp stb_image_write.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o stb_image_write.o stb_image_write.cpp
 
 Cloth.o: Cloth.cpp Cloth.h \
 		Cartesian3.h \
@@ -469,6 +487,9 @@ main.o: main.cpp RenderWidget.h \
 		Wind.h \
 		Plane.h \
 		Sphere.h \
+		screenRecord.h \
+		stb_image_write.h \
+		stb_image.h \
 		RGBAImage.h \
 		RGBAValue.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
@@ -485,6 +506,9 @@ MasterWidget.o: MasterWidget.cpp MasterWidget.h \
 		Wind.h \
 		Plane.h \
 		Sphere.h \
+		screenRecord.h \
+		stb_image_write.h \
+		stb_image.h \
 		RGBAImage.h \
 		RGBAValue.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o MasterWidget.o MasterWidget.cpp
@@ -512,6 +536,9 @@ RenderWidget.o: RenderWidget.cpp RenderWidget.h \
 		Wind.h \
 		Plane.h \
 		Sphere.h \
+		screenRecord.h \
+		stb_image_write.h \
+		stb_image.h \
 		RGBAImage.h \
 		RGBAValue.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o RenderWidget.o RenderWidget.cpp

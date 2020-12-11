@@ -85,6 +85,18 @@ RenderWidget::RenderWidget(char *filename, char *texFilename, MasterWidget *pare
 
 		setMouseTracking(true);
 
+
+
+    // Recording Setup
+    // --------------------
+		framerate = 60;
+    maxFrames = 120;
+		doScreenRecording = false;
+    screenRecord = new ScreenRecord(1, maxFrames, framerate);
+    std::thread startUp(&ScreenRecord::clearSections, screenRecord);
+    startUp.join();
+
+
 	} // constructor
 
 // destructor
@@ -385,6 +397,9 @@ void RenderWidget::loadOBJButtonPressed()
 
 		sim = new Simulation(newFileName.toStdString().c_str());
 		sim->FindGlobalPosition(&camera);
+
+	  sim->AddPlane(Cartesian3(0., -5., 0.), 12., 12., 1.);
+
 		// initialise the mouse clicker
 		mousePicker = new MousePick(&(sim->globalPositions), 1.0);
 
@@ -470,6 +485,9 @@ void RenderWidget::timerUpdate()
 			}
 			// actually redraw the screen
 			updateNeeded = true;
+
+			// increment frame
+			renderFrame++;
 		}
 	}
 
@@ -503,7 +521,25 @@ void RenderWidget::timerUpdate()
 			// update the global positions
 			sim->FindGlobalPosition(&camera);
 			mousePicker->UpdateTargetPoints(&(sim->globalPositions));
+
+			if(doScreenRecording && renderFrame <= maxFrames)
+			{
+				screenRecord->recordFrame(renderFrame);
+				std::cout << "Record Frame " << renderFrame << '\n';
+				if((int)renderFrame % 60 == 0 && renderFrame > 0){ std::cout << " Saving " << std::endl; std::thread addImagesThread(&ScreenRecord::imagesToVideoSegment, screenRecord); addImagesThread.join(); }
+			}
 		}
 
+	}
+
+	if(renderFrame == maxFrames)
+	{
+		if(doScreenRecording)
+		{
+			std::cout << "Saving Final Video" << '\n';
+			std::thread compileVideoThread(&ScreenRecord::saveVideo, screenRecord);
+			compileVideoThread.join();
+			std::cout << "Saved" << '\n';
+		}
 	}
 }

@@ -45,6 +45,8 @@ enum FORCES
   MOUSE,
   GRAVITY,
   COLLISION,
+  PFRICTION,
+  BFRICTION,
 };
 
 class PointMass

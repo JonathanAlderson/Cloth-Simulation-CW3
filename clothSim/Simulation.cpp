@@ -225,6 +225,7 @@ void Simulation::SaveFile(std::string fileName)
 // and find out what the global positions are
 void Simulation::Update(float dT)
 {
+  std::cout << "\n\n\n-------------------------" << std::endl;
 
   // call the cloths update function
   cloth->Update(dT);
